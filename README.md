@@ -28,6 +28,19 @@ Many skills in this repo are open source (Apache 2.0). We've also included the d
 - [./spec](./spec): The Agent Skills specification
 - [./template](./template): Skill template
 
+## Vendored Skills
+
+This fork also vendors the 286 skills from [ECC](https://github.com/affaan-m/ecc)
+(MIT, Copyright (c) 2026 Affaan Mustafa) into [`./skills`](./skills). They cover agent
+harness construction, evaluation and benchmarking, language and framework patterns,
+cloud and data tooling, security, and industry workflows. They are copied unmodified;
+the exact list is the `ecc-skills` plugin in
+[`.claude-plugin/marketplace.json`](./.claude-plugin/marketplace.json), and the license
+is reproduced in [`THIRD_PARTY_NOTICES.md`](./THIRD_PARTY_NOTICES.md).
+
+To refresh them against upstream, re-copy `skills/` from a fresh clone of
+`https://github.com/affaan-m/ecc` and update the plugin list.
+
 # Try in Claude Code, Claude.ai, and the API
 
 ## Claude Code
@@ -46,6 +59,7 @@ Alternatively, directly install either Plugin via:
 ```
 /plugin install document-skills@anthropic-agent-skills
 /plugin install example-skills@anthropic-agent-skills
+/plugin install ecc-skills@anthropic-agent-skills
 ```
 
 After installing the plugin, you can use the skill by just mentioning it. For instance, if you install the `document-skills` plugin from the marketplace, you can ask Claude Code to do something like: "Use the PDF skill to extract the form fields from `path/to/some-file.pdf`"
