@@ -1,0 +1,22 @@
+{
+  "paper_starting_usd": 1000,
+  "universe": ["SOL", "ETH", "BTC", "JUP", "RAY", "JTO", "PYTH", "WIF", "BONK"],
+  "use_claude_news": true,
+  "btc_regime_filter": true,
+  "cost_per_side": 0.002,
+  "slippage_bps": 50,
+  "max_price_impact_pct": 0.5,
+  "strategy": {
+    "trend_ema": 100, "rsi_len": 3, "rsi_entry": 10, "rsi_exit": 70,
+    "stop_atr": 3.0, "target_atr": 0.0, "max_bars": 12
+  },
+  "risk": {
+    "risk_per_trade": 0.01,
+    "max_position": 0.20,
+    "max_exposure": 0.60,
+    "max_open_positions": 3,
+    "kelly_fraction": 0.25,
+    "daily_loss_limit": 0.03,
+    "max_drawdown_halt": 0.15
+  }
+}
