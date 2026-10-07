@@ -1,0 +1,7 @@
+requests>=2.31
+pandas>=2.0
+numpy>=1.26
+# optional: lets KOKO read the news with Claude instead of keyword matching
+anthropic>=1.0
+# tests
+pytest>=8
