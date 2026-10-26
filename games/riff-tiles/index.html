@@ -899,7 +899,13 @@ async function trackBuffer(song, mult, onProgress) {
   if (!t.stretched[mult]) t.stretched[mult] = await stretch(base, mult, onProgress);
   return t.stretched[mult];
 }
-idb.get('everlong').then(v => { if (v && v.data) TRACKS.everlong = { name: v.name, data: v.data, decoded: null, stretched: {} }; });
+// a personal build can carry the player's own recording inline (window.RIFF_TILES_TRACK)
+if (window.RIFF_TILES_TRACK) {
+  const e = window.RIFF_TILES_TRACK, bin = atob(e.b64), u8 = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i);
+  TRACKS[e.id] = { name: e.name, data: u8.buffer, decoded: null, stretched: {} };
+}
+idb.get('everlong').then(v => { if (v && v.data && !TRACKS.everlong) TRACKS.everlong = { name: v.name, data: v.data, decoded: null, stretched: {} }; });
 
 /* =========================================================
    GAME
@@ -920,6 +926,7 @@ const G = {
   score: 0, combo: 0, maxCombo: 0, counts: {}, holds: new Map(), flashes: [], judge: null, fail: null,
   frozen: 0, W: 0, H: 0, hitY: 0, ppb: 1, dpr: 1, finishedAt: 0,
 };
+if (window.RIFF_TILES_TRACK) G.back = 'track';
 
 let lastCtxT = -1, lastPerf = 0;
 function audioNow() {
