@@ -1,0 +1,1125 @@
+<title>Riff Tiles</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bowlby+One+SC&family=Permanent+Marker&family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+/* Layout: a dark club stage; the setlist is a gaffer-taped paper sheet, the game is a white Piano-Tiles board lit by stage lights */
+:root {
+  --stage: #0e0c12;
+  --stage-2: #1a1720;
+  --paper: #f3f1ea;
+  --paper-2: #e4e1d7;
+  --ink: #131216;
+  --ink-soft: #5d5965;
+  --amber: #ffb420;
+  --amber-deep: #b86e00;
+  --red: #e2272d;
+  --tape: rgba(255, 196, 92, .55);
+  --f-display: 'Bowlby One SC', Impact, 'Arial Black', sans-serif;
+  --f-marker: 'Permanent Marker', 'Comic Sans MS', 'Marker Felt', cursive;
+  --f-body: 'Barlow Condensed', 'Arial Narrow', 'Roboto Condensed', sans-serif;
+  --f-mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { height: 100%; }
+body {
+  margin: 0; background: var(--stage); color: var(--paper);
+  font-family: var(--f-body); font-size: 18px; line-height: 1.35;
+  overflow: hidden; -webkit-tap-highlight-color: transparent;
+  -webkit-user-select: none; user-select: none;
+}
+button { font: inherit; color: inherit; cursor: pointer; }
+button:focus-visible { outline: 3px solid var(--amber); outline-offset: 2px; }
+.screen {
+  position: fixed; left: 0; right: 0;
+  top: env(safe-area-inset-top, 0px); bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* ---------- Menu ---------- */
+#menu {
+  overflow-y: auto; -webkit-overflow-scrolling: touch;
+  padding-block: 28px 48px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  background:
+    radial-gradient(120% 60% at 50% -10%, rgba(255, 180, 32, .18), transparent 60%),
+    radial-gradient(80% 50% at 100% 100%, rgba(226, 39, 45, .10), transparent 70%),
+    var(--stage);
+}
+.wrap { max-width: 620px; margin: 0 auto; display: flex; flex-direction: column; gap: 28px; }
+.mast { display: grid; grid-template-columns: 1fr auto; gap: 16px; align-items: end; }
+.eyebrow {
+  margin: 0; font-family: var(--f-mono); font-size: 12px; font-weight: 600;
+  letter-spacing: .14em; text-transform: uppercase; color: var(--amber);
+}
+h1 {
+  margin: 6px 0 0; font-family: var(--f-display); font-weight: 400;
+  font-size: clamp(64px, 19vw, 118px); line-height: .82; letter-spacing: -.01em;
+  text-wrap: balance;
+}
+h1 span { color: var(--amber); display: block; }
+.lede { grid-column: 1 / -1; margin: 0; max-width: 46ch; color: #cfcbd6; font-size: 19px; }
+.mini-board {
+  width: 92px; height: 132px; background: var(--paper); border-radius: 4px;
+  display: grid; grid-template-columns: repeat(4, 1fr); position: relative; overflow: hidden;
+  box-shadow: 0 0 0 4px var(--stage-2), 0 0 40px rgba(255, 180, 32, .25);
+}
+.mini-board i { border-right: 1px solid rgba(19, 18, 22, .12); position: relative; }
+.mini-board i:last-child { border-right: 0; }
+.mini-board i::after {
+  content: ""; position: absolute; left: 1px; right: 1px; height: 30%;
+  background: var(--ink); border-radius: 2px; animation: fall 1.6s linear infinite;
+}
+.mini-board i:nth-child(1)::after { animation-delay: -.2s; }
+.mini-board i:nth-child(2)::after { animation-delay: -1.0s; }
+.mini-board i:nth-child(3)::after { animation-delay: -.6s; }
+.mini-board i:nth-child(4)::after { animation-delay: -1.4s; }
+@keyframes fall { from { top: -30%; } to { top: 100%; } }
+
+.setlist {
+  position: relative; background: var(--paper); color: var(--ink);
+  border-radius: 3px; padding: 26px 18px 14px; transform: rotate(-.7deg);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, .55), inset 0 0 60px rgba(160, 140, 100, .14);
+}
+.setlist::before, .setlist::after {
+  content: ""; position: absolute; top: -12px; width: 86px; height: 26px; background: var(--tape);
+}
+.setlist::before { left: 18px; transform: rotate(-5deg); }
+.setlist::after { right: 18px; transform: rotate(4deg); }
+.setlist-head {
+  display: flex; justify-content: space-between; align-items: baseline; gap: 12px;
+  border-bottom: 2px solid var(--ink); padding-bottom: 8px;
+  font-family: var(--f-mono); font-size: 12px; letter-spacing: .12em; text-transform: uppercase;
+}
+.setlist ol { list-style: none; margin: 0; padding: 0; }
+.song {
+  width: 100%; display: grid; grid-template-columns: 30px 1fr auto; gap: 12px; align-items: center;
+  padding: 14px 4px; background: none; border: 0; border-bottom: 1px solid rgba(19, 18, 22, .16);
+  text-align: left; color: var(--ink);
+}
+.setlist li:last-child .song { border-bottom: 0; }
+.song:hover { background: rgba(255, 180, 32, .16); }
+.song .no { font-family: var(--f-mono); font-size: 13px; color: var(--ink-soft); }
+.song .name { min-width: 0; }
+.song .name b {
+  display: block; font-family: var(--f-marker); font-weight: 400; font-size: 26px; line-height: 1.1;
+}
+.song .name small { display: block; font-size: 16px; color: var(--ink-soft); font-weight: 600; letter-spacing: .02em; }
+.song .meta { text-align: right; font-family: var(--f-mono); font-size: 12px; color: var(--ink-soft); display: grid; gap: 3px; }
+.song .meta .lvl { font-weight: 600; color: var(--ink); }
+.stars-sm { color: var(--amber-deep); letter-spacing: .1em; font-size: 13px; }
+.howto {
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px;
+  font-size: 16px; color: #bdb8c6;
+}
+.howto div { border-top: 2px solid var(--stage-2); padding-top: 10px; min-width: 0; }
+.howto b { display: block; color: var(--paper); font-weight: 700; letter-spacing: .03em; text-transform: uppercase; font-size: 15px; }
+kbd { font-family: var(--f-mono); font-size: 12px; border: 1px solid #4a4552; border-radius: 3px; padding: 0 4px; color: var(--paper); }
+.fine { margin: 0; font-size: 14px; color: #8d8897; }
+@media (max-width: 460px) { .howto { grid-template-columns: 1fr; } }
+
+/* ---------- Sheets (difficulty, results, pause) ---------- */
+.overlay {
+  position: fixed; inset: 0; z-index: 20; display: flex; align-items: center; justify-content: center;
+  background: rgba(8, 7, 10, .72); backdrop-filter: blur(3px);
+  padding-block: max(16px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-bottom, 0px));
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.card {
+  width: 100%; max-width: 440px; max-height: 100%; overflow-y: auto;
+  background: var(--paper); color: var(--ink); border-radius: 4px; padding: 22px 20px 20px;
+  display: flex; flex-direction: column; gap: 16px; box-shadow: 0 24px 60px rgba(0, 0, 0, .6);
+}
+.card .eyebrow { color: var(--amber-deep); }
+.card h2 { margin: 2px 0 0; font-family: var(--f-marker); font-weight: 400; font-size: 34px; line-height: 1.05; text-wrap: balance; }
+.card .sub { margin: 0; color: var(--ink-soft); font-weight: 600; font-size: 17px; }
+.label { font-family: var(--f-mono); font-size: 11px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-soft); margin: 0 0 6px; }
+.seg { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.seg.two { grid-template-columns: repeat(2, 1fr); }
+.opt {
+  background: var(--paper-2); border: 2px solid transparent; border-radius: 4px;
+  padding: 10px 8px; text-align: left; color: var(--ink); display: grid; gap: 2px; min-width: 0;
+}
+.opt b { font-size: 20px; font-weight: 700; line-height: 1.1; }
+.opt small { font-family: var(--f-mono); font-size: 11px; color: var(--ink-soft); }
+.opt[aria-pressed="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.opt[aria-pressed="true"] small { color: var(--amber); }
+.mode-note { margin: 6px 0 0; font-size: 16px; color: var(--ink-soft); }
+.best-line { margin: 0; font-family: var(--f-mono); font-size: 13px; color: var(--ink-soft); }
+.actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.btn {
+  flex: 1 1 auto; border: 2px solid var(--ink); background: transparent; color: var(--ink);
+  border-radius: 4px; padding: 12px 16px; font-weight: 700; font-size: 19px; letter-spacing: .04em; text-transform: uppercase;
+}
+.btn.primary { background: var(--ink); color: var(--amber); }
+.btn.primary:hover { background: #000; }
+.big-score { font-family: var(--f-display); font-size: 54px; line-height: 1; color: var(--red); font-variant-numeric: tabular-nums; }
+.stars { font-size: 34px; letter-spacing: .12em; color: var(--amber-deep); line-height: 1; }
+.stars .off { color: #cfcabd; }
+.stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: 0; }
+.stats div { border-top: 1px solid rgba(19, 18, 22, .2); padding-top: 6px; }
+.stats dt { font-family: var(--f-mono); font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-soft); }
+.stats dd { margin: 0; font-size: 24px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.countdown { font-family: var(--f-display); font-size: 96px; color: var(--amber); text-align: center; line-height: 1; }
+
+/* ---------- Game ---------- */
+#game { background: var(--stage); overflow: hidden; }
+.light {
+  position: absolute; top: -10%; bottom: -10%; width: 60%; pointer-events: none; opacity: .35;
+  background: radial-gradient(closest-side, rgba(255, 180, 32, .55), transparent);
+}
+.light.l { left: -25%; }
+.light.r { right: -25%; background: radial-gradient(closest-side, rgba(226, 39, 45, .45), transparent); }
+#board {
+  position: absolute; top: 0; bottom: 0; left: 50%; transform: translateX(-50%);
+  width: min(100%, 520px); box-shadow: 0 0 0 1px #000, 0 0 80px rgba(0, 0, 0, .8);
+}
+#cv { display: block; width: 100%; height: 100%; touch-action: none; }
+#pauseBtn {
+  position: absolute; top: 10px; left: 10px; width: 40px; height: 40px; border-radius: 50%;
+  border: 0; background: rgba(19, 18, 22, .82); color: var(--paper); display: grid; place-items: center; z-index: 5;
+}
+#pauseBtn svg { width: 16px; height: 16px; }
+@media (prefers-reduced-motion: reduce) {
+  .mini-board i::after { animation: none; top: 35%; }
+  .light { display: none; }
+}
+</style>
+
+<section id="menu" class="screen">
+  <div class="wrap">
+    <header class="mast">
+      <div>
+        <p class="eyebrow">Tonight's set · 4 songs</p>
+        <h1>Riff <span>Tiles</span></h1>
+      </div>
+      <div class="mini-board" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+      <p class="lede">Tap the black tiles to play the guitar part. Drums, bass and rhythm guitar play along with you, so every note you hit drops into a full band.</p>
+    </header>
+
+    <div class="setlist">
+      <div class="setlist-head"><span>Setlist</span><span>Pick a song</span></div>
+      <ol id="songList"></ol>
+    </div>
+
+    <div class="howto">
+      <div><b>Tap</b>Hit the lowest black tile. Tapping white space ends the song in Classic.</div>
+      <div><b>Hold</b>Long tiles ring out while you keep your finger down.</div>
+      <div><b>Keys</b><kbd>D</kbd> <kbd>F</kbd> <kbd>J</kbd> <kbd>K</kbd> play the four lanes. <kbd>Esc</kbd> pauses.</div>
+    </div>
+    <p class="fine">Simplified arrangements, synthesized live in your browser. Turn the sound up; headphones help.</p>
+  </div>
+</section>
+
+<section id="game" class="screen" hidden>
+  <div class="light l" id="lightL"></div>
+  <div class="light r" id="lightR"></div>
+  <div id="board">
+    <canvas id="cv"></canvas>
+    <button id="pauseBtn" aria-label="Pause"><svg viewBox="0 0 16 16" fill="currentColor"><rect x="3" y="2" width="3.5" height="12" rx="1"/><rect x="9.5" y="2" width="3.5" height="12" rx="1"/></svg></button>
+  </div>
+</section>
+
+<div id="sheet" class="overlay" hidden>
+  <div class="card" role="dialog" aria-labelledby="sheetTitle">
+    <div>
+      <p class="eyebrow" id="sheetNo">Song 1</p>
+      <h2 id="sheetTitle">Everlong</h2>
+      <p class="sub" id="sheetArtist">Foo Fighters</p>
+    </div>
+    <div>
+      <p class="label">Speed</p>
+      <div class="seg" id="speedSeg"></div>
+    </div>
+    <div>
+      <p class="label">Mode</p>
+      <div class="seg two" id="modeSeg">
+        <button class="opt" id="mode-classic" data-mode="classic"><b>Classic</b><small>One mistake ends it</small></button>
+        <button class="opt" id="mode-jam" data-mode="jam"><b>Jam</b><small>Play through misses</small></button>
+      </div>
+    </div>
+    <p class="best-line" id="sheetBest">No score yet on this setting</p>
+    <div class="actions">
+      <button class="btn" id="sheetBack">Back</button>
+      <button class="btn primary" id="sheetPlay">Play</button>
+    </div>
+  </div>
+</div>
+
+<div id="pause" class="overlay" hidden>
+  <div class="card">
+    <div>
+      <p class="eyebrow">Paused</p>
+      <h2 id="pauseTitle">Everlong</h2>
+    </div>
+    <div class="countdown" id="pauseCount" hidden>3</div>
+    <div class="actions" id="pauseActions">
+      <button class="btn" id="pQuit">Setlist</button>
+      <button class="btn" id="pRestart">Restart</button>
+      <button class="btn primary" id="pResume">Resume</button>
+    </div>
+  </div>
+</div>
+
+<div id="results" class="overlay" hidden>
+  <div class="card" id="resCard"></div>
+</div>
+
+<script>
+(() => {
+'use strict';
+
+/* =========================================================
+   SONGS — simplified arrangements.
+   lead:  "note:beats" tokens. r = rest. ^ = power chord, ~ = add octave below.
+   prog:  chords per bar, bars split by "|", chords inside a bar share it evenly.
+   ========================================================= */
+const EV_RD = 'D4:.5 A4:.5 E5:1 A4:.5 D5:.5 E5:1';
+const EV_RB = 'B3:.5 F#4:.5 D5:1 F#4:.5 B4:.5 D5:1';
+const EV_RG = 'G3:.5 D4:.5 B4:1 D4:.5 G4:.5 F#4:1';
+const EV_RIFF = [EV_RD, EV_RD, EV_RB, EV_RG].join(' ');
+const EV_VPROG = 'Dadd9|Dadd9|Bm7|Gmaj7';
+const EV_HOOK = 'F#5:1 E5:1 D5:1 E5:1 D5:1 B4:1 A4:2 B4:1 D5:1 E5:1 F#5:1 E5:2 D5:2';
+const EV_CPROG = 'D5|B5|G5|G5';
+
+const SNA_RIFF = 'E3~:1.5 E3~:.5 G3~:.75 E3~:.75 D3~:.5 C3~:2 B2~:2';
+const SNA_BIG = 'E3^:1.5 E3^:.5 G3^:.75 E3^:.75 D3^:.5 C3^:2 B2^:2';
+const SNA_BUILD = 'G3^:.5 G3^:.5 G3^:.5 G3^:.5 G3^:.5 G3^:.5 G3^:.5 G3^:.5 A3^:.5 A3^:.5 A3^:.5 A3^:.5 A3^:.5 A3^:.5 A3^:.5 A3^:.5';
+
+const SC_D = 'D4:.5 D5:.5 A4:.5 G4:.5 G5:.5 A4:.5 F#5:.5 A4:.5';
+const SC_C = 'E4:.5 D5:.5 A4:.5 G4:.5 G5:.5 A4:.5 F#5:.5 A4:.5';
+const SC_G = 'G4:.5 D5:.5 A4:.5 G4:.5 G5:.5 A4:.5 F#5:.5 A4:.5';
+const SC_RIFF = [SC_D, SC_D, SC_C, SC_C, SC_G, SC_G, SC_D, SC_D].join(' ');
+const SC_PROG = 'D|D|C|C|G|G|D|D';
+
+const TS_RIFF = 'F3^:1 F3^:.5 F3^:.5 Bb2^:1 Bb2^:.5 Bb2^:.5 Ab2^:1 Ab2^:.5 Ab2^:.5 Db3^:1 Db3^:.5 Db3^:.5';
+const TS_PROG = 'F5 Bb5|Ab5 Db5';
+const TS_VERSE = 'C4:1.5 Bb3:.5 r:2 C4:1.5 Ab3:.5 r:2';
+const TS_PRE = 'F3^:2 Bb2^:2 Ab2^:2 Db3^:2';
+
+const SONGS = [
+  {
+    id: 'everlong', title: 'Everlong', artist: 'Foo Fighters', year: 1997, bpm: 158, view: 4, countIn: 4, tone: 'drive',
+    sections: [
+      { name: 'Intro', prog: EV_VPROG, tone: 'clean', lead: EV_RIFF },
+      { name: 'Intro', prog: EV_VPROG, tone: 'clean', drums: 'rock', bass: 'root8', gtr: 'pad', lead: EV_RIFF, fill: true },
+      { name: 'Verse', prog: EV_VPROG, x: 2, tone: 'clean', drums: 'rock', bass: 'root8', gtr: 'pad', lead: EV_RIFF, fill: true },
+      { name: 'Chorus', prog: EV_CPROG, x: 2, drums: 'drive', bass: 'root8', gtr: 'chug8', crash: true, lead: EV_HOOK, fill: true },
+      { name: 'Verse', prog: EV_VPROG, tone: 'clean', drums: 'rock', bass: 'root8', gtr: 'pad', lead: EV_RIFF, fill: true },
+      { name: 'Chorus', prog: EV_CPROG, x: 2, drums: 'drive', bass: 'root8', gtr: 'chug8', crash: true, lead: EV_HOOK },
+      { name: 'Bridge', prog: 'Dadd9|Bm7|Gmaj7|Gmaj7', x: 2, tone: 'clean', drums: 'quiet', bass: 'whole', gtr: 'arp', lead: 'D5:4 B4:4 G4:2 F#4:2 G4:4' },
+      { name: 'Build', prog: 'A5|A5', drums: 'build', bass: 'root8', gtr: 'chug8', lead: 'A4^:1 A4^:1 A4^:1 A4^:1 A4^:.5 A4^:.5 A4^:.5 A4^:.5 B4^:.5 B4^:.5 C#5^:.5 C#5^:.5' },
+      { name: 'Chorus', prog: EV_CPROG, x: 2, drums: 'drive', bass: 'root8', gtr: 'chug8', crash: true, lead: EV_HOOK, fill: true },
+      { name: 'Outro', prog: EV_VPROG, tone: 'clean', drums: 'rock', bass: 'root8', gtr: 'pad', lead: EV_RIFF },
+      { name: 'End', prog: 'D5', bass: 'whole', gtr: 'hold', crash: true, lead: 'D4^:4' },
+    ],
+  },
+  {
+    id: 'sna', title: 'Seven Nation Army', artist: 'The White Stripes', year: 2003, bpm: 124, view: 4, countIn: 4, tone: 'drive',
+    sections: [
+      { name: 'Intro', prog: 'E5|C5 B5', x: 2, drums: 'four', lead: SNA_RIFF },
+      { name: 'Verse', prog: 'E5|C5 B5', x: 4, drums: 'sna', lead: SNA_RIFF, fill: true },
+      { name: 'Build', prog: 'G5|A5', drums: 'build', bass: 'root8', lead: SNA_BUILD },
+      { name: 'Chorus', prog: 'E5|C5 B5', x: 4, drums: 'drive', bass: 'root8', crash: true, lead: SNA_BIG, fill: true },
+      { name: 'Verse', prog: 'E5|C5 B5', x: 2, drums: 'sna', lead: SNA_RIFF },
+      { name: 'Build', prog: 'G5|A5', drums: 'build', bass: 'root8', lead: SNA_BUILD },
+      { name: 'Chorus', prog: 'E5|C5 B5', x: 4, drums: 'drive', bass: 'root8', crash: true, lead: SNA_BIG, fill: true },
+      { name: 'End', prog: 'E5', bass: 'whole', crash: true, lead: 'E3^:4' },
+    ],
+  },
+  {
+    id: 'teen', title: 'Smells Like Teen Spirit', artist: 'Nirvana', year: 1991, bpm: 116, view: 4, countIn: 4, tone: 'drive',
+    sections: [
+      { name: 'Intro', prog: TS_PROG, x: 2, tone: 'clean', lead: TS_RIFF, fill: true },
+      { name: 'Riff', prog: TS_PROG, x: 4, drums: 'drive', bass: 'root8', gtr: 'chug8', crash: true, lead: TS_RIFF, fill: true },
+      { name: 'Verse', prog: TS_PROG, x: 4, tone: 'clean', drums: 'half', bass: 'root8', lead: TS_VERSE },
+      { name: 'Pre-chorus', prog: TS_PROG, x: 2, drums: 'build', bass: 'root8', gtr: 'hold', lead: TS_PRE, fill: true },
+      { name: 'Chorus', prog: TS_PROG, x: 4, drums: 'drive', bass: 'root8', gtr: 'chug8', crash: true, lead: TS_RIFF, fill: true },
+      { name: 'End', prog: 'F5', bass: 'whole', gtr: 'hold', crash: true, lead: 'F3^:4' },
+    ],
+  },
+  {
+    id: 'scom', title: "Sweet Child O' Mine", artist: "Guns N' Roses", year: 1987, bpm: 125, view: 3, countIn: 4, tone: 'drive',
+    sections: [
+      { name: 'Intro', prog: SC_PROG, lead: SC_RIFF },
+      { name: 'Band in', prog: SC_PROG, drums: 'tom', bass: 'whole', crash: true, lead: SC_RIFF, fill: true },
+      { name: 'Full band', prog: SC_PROG, x: 2, drums: 'rock', bass: 'root8', gtr: 'hold', crash: 'each', lead: SC_RIFF, fill: true },
+      { name: 'End', prog: 'D', bass: 'whole', gtr: 'hold', crash: true, lead: 'D4^:4' },
+    ],
+  },
+];
+
+const SPEEDS = [
+  { id: 'slow', label: 'Slow', mult: 0.8 },
+  { id: 'normal', label: 'Normal', mult: 1 },
+  { id: 'fast', label: 'Fast', mult: 1.25 },
+];
+
+const DRUMS = {
+  none: {},
+  four: { k: 'x...x...x...x...', h: '..g...g...g...g.' },
+  sna: { k: 'x...x...x...x...', s: '....g.......g...', h: 'x.x.x.x.x.x.x.x.' },
+  rock: { k: 'x.......x.x.....', s: '....x.......x...', h: 'x.x.x.x.x.x.x.x.' },
+  drive: { k: 'x.....x.x.....x.', s: '....X.......X...', o: 'x.x.x.x.x.x.x.x.' },
+  half: { k: 'x.....x...x.....', s: '........X.......', h: 'x...x...x...x...' },
+  quiet: { k: 'x.......x.......', h: 'g.g.g.g.g.g.g.g.' },
+  build: { k: 'x...x...x...x...', s: 'x.x.x.x.x.x.x.x.' },
+  tom: { k: 'x.......x.......', t: '....x.......x.x.', h: 'x.x.x.x.x.x.x.x.' },
+};
+const VEL = { x: .8, X: 1, g: .4 };
+const INST = { k: 'kick', s: 'snare', h: 'hat', o: 'ohat', t: 'tom' };
+
+/* ---------- parsing ---------- */
+const PC = { C: 0, 'C#': 1, Db: 1, D: 2, 'D#': 3, Eb: 3, E: 4, F: 5, 'F#': 6, Gb: 6, G: 7, 'G#': 8, Ab: 8, A: 9, 'A#': 10, Bb: 10, B: 11 };
+const CHORD_IV = { '5': [0, 7, 12], '': [0, 7, 12, 16], m: [0, 7, 12, 15], add9: [0, 7, 14, 16], m7: [0, 7, 10, 15], maj7: [0, 7, 11, 16], sus2: [0, 7, 14] };
+function noteMidi(s) {
+  const m = /^([A-G][#b]?)(-?\d)$/.exec(s);
+  if (!m) throw new Error('Bad note ' + s);
+  return 12 * (+m[2] + 1) + PC[m[1]];
+}
+function parseLead(str) {
+  const notes = []; let b = 0;
+  for (const tok of str.trim().split(/\s+/)) {
+    const [n, d] = tok.split(':'); const dur = parseFloat(d);
+    if (n !== 'r') {
+      let name = n, mod = '';
+      if (/[\^~]$/.test(name)) { mod = name.slice(-1); name = name.slice(0, -1); }
+      const base = noteMidi(name);
+      const midi = mod === '^' ? [base, base + 7, base + 12] : mod === '~' ? [base - 12, base] : [base];
+      notes.push({ b, dur, midi });
+    }
+    b += dur;
+  }
+  return { notes, len: b };
+}
+function parseChord(name) {
+  const m = /^([A-G][#b]?)(.*)$/.exec(name);
+  const root = 40 + ((PC[m[1]] - 4 + 12) % 12);
+  return { root, iv: CHORD_IV[m[2]] || CHORD_IV['5'] };
+}
+function rng(seed) {
+  return () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+}
+function hash(s) { let h = 2166136261; for (const c of s) h = Math.imul(h ^ c.charCodeAt(0), 16777619); return h >>> 0; }
+
+function buildSong(song) {
+  const backing = [], tiles = [], marks = [];
+  for (let i = 0; i < song.countIn; i++) backing.push({ b: -song.countIn + i, k: 'stick', v: i === 0 ? 1 : .7 });
+  let at = 0;
+  for (const sec of song.sections) {
+    const reps = sec.x || 1, bars = sec.prog.split('|');
+    const lead = sec.lead ? parseLead(sec.lead) : null;
+    const secLen = bars.length * 4;
+    for (let r = 0; r < reps; r++) {
+      const start = at;
+      if (r === 0) marks.push({ b: start, name: sec.name });
+      bars.forEach((barStr, bi) => {
+        const chs = barStr.trim().split(/\s+/), seg = 4 / chs.length;
+        chs.forEach((c, ci) => { if (c !== '-') addHarmony(sec, parseChord(c), start + bi * 4 + ci * seg, seg, backing); });
+        const pat = DRUMS[sec.drums || 'none'];
+        const isFill = sec.fill && r === reps - 1 && bi === bars.length - 1;
+        const prog = (r * bars.length + bi) / (reps * bars.length);
+        for (const [ins, str] of Object.entries(pat)) {
+          for (let s = 0; s < 16; s++) {
+            const ch = str[s]; if (!VEL[ch]) continue;
+            if (isFill && s >= 8) continue;
+            let v = VEL[ch]; if (sec.drums === 'build') v *= .35 + .65 * prog;
+            backing.push({ b: start + bi * 4 + s / 4, k: INST[ins], v });
+          }
+        }
+        if (isFill) {
+          const f = 'sstsstss', fb = start + bi * 4 + 2;
+          for (let s = 0; s < 8; s++) backing.push({ b: fb + s / 4, k: f[s] === 's' ? 'snare' : 'tom', v: .55 + s * .05, p: s });
+          backing.push({ b: fb, k: 'kick', v: .8 }, { b: fb + 1, k: 'kick', v: .8 });
+        }
+      });
+      if (sec.crash && (r === 0 || sec.crash === 'each')) backing.push({ b: start, k: 'crash', v: 1 }, { b: start, k: 'kick', v: 1 });
+      if (lead) {
+        if (Math.abs(lead.len - secLen) > 1e-6) console.warn(song.id, sec.name, 'lead is', lead.len, 'beats; section is', secLen);
+        for (const n of lead.notes) tiles.push({ b: start + n.b, dur: n.dur, midi: n.midi, tone: sec.tone || song.tone });
+      }
+      at += secLen;
+    }
+  }
+  backing.sort((a, b) => a.b - b.b);
+  tiles.sort((a, b) => a.b - b.b);
+  tiles.forEach((t, i) => {
+    const gap = i + 1 < tiles.length ? tiles[i + 1].b - t.b : Math.max(t.dur, 1);
+    t.hold = t.dur >= 2 && gap >= 2 - 1e-6;
+    t.hb = t.hold ? Math.min(t.dur, gap) : Math.min(gap, 1);
+  });
+  assignLanes(tiles, hash(song.id));
+  return { backing, tiles, marks, length: at };
+}
+function addHarmony(sec, ch, b, len, out) {
+  const full = ch.iv.map(i => ch.root + i), power = [ch.root, ch.root + 7, ch.root + 12];
+  switch (sec.gtr) {
+    case 'chug8': for (let x = 0; x < len - 1e-6; x += .5) out.push({ b: b + x, k: 'gtr', notes: power, dur: x === 0 ? .45 : .3, v: x === 0 ? .4 : .3 }); break;
+    case 'hold': out.push({ b, k: 'gtr', notes: power, dur: len * .97, v: .34 }); break;
+    case 'pad': out.push({ b, k: 'pad', notes: full, dur: len * .98, v: .12 }); break;
+    case 'arp': for (let x = 0, i = 0; x < len - 1e-6; x += .5, i++) out.push({ b: b + x, k: 'pad', notes: [full[i % full.length]], dur: 1.5, v: .16 }); break;
+  }
+  switch (sec.bass) {
+    case 'root8': for (let x = 0; x < len - 1e-6; x += .5) out.push({ b: b + x, k: 'bass', m: ch.root - 12, dur: .42, v: x === 0 ? .85 : .7 }); break;
+    case 'root4': for (let x = 0; x < len - 1e-6; x += 1) out.push({ b: b + x, k: 'bass', m: ch.root - 12, dur: .9, v: .8 }); break;
+    case 'whole': out.push({ b, k: 'bass', m: ch.root - 12, dur: len * .97, v: .85 }); break;
+  }
+}
+function assignLanes(tiles, seed) {
+  const r = rng(seed); let lane = Math.floor(r() * 4), prev = null;
+  for (const t of tiles) {
+    const p = t.midi.reduce((a, c) => a + c, 0) / t.midi.length;
+    if (prev !== null) {
+      const d = p - prev;
+      if (Math.abs(d) < .01) { let n; do { n = Math.floor(r() * 4); } while (n === lane); lane = n; }
+      else {
+        let n = lane + Math.sign(d) * (Math.abs(d) >= 5 ? 2 : 1);
+        if (n > 3) n = Math.floor(r() * lane);
+        else if (n < 0) n = lane + 1 + Math.floor(r() * (3 - lane));
+        lane = n;
+      }
+    }
+    t.lane = lane; prev = p;
+  }
+}
+SONGS.forEach(s => { s.built = buildSong(s); });
+
+/* =========================================================
+   AUDIO — everything synthesized with Web Audio
+   ========================================================= */
+let ac = null, musicBus, sfxBus, rev, noiseBuf, B = {};
+const live = new Set();
+const mtof = m => 440 * Math.pow(2, (m - 69) / 12);
+
+function distCurve(k) {
+  const n = 2048, c = new Float32Array(n);
+  for (let i = 0; i < n; i++) { const x = i * 2 / n - 1; c[i] = (1 + k) * x / (1 + k * Math.abs(x)); }
+  return c;
+}
+function gainTo(dest, v) { const g = ac.createGain(); g.gain.value = v; g.connect(dest); return g; }
+function filt(type, f, q) { const n = ac.createBiquadFilter(); n.type = type; n.frequency.value = f; if (q != null) n.Q.value = q; return n; }
+function makeBus({ drive = 0, lp = 5000, level = .3, send = 0, delay = 0, to }) {
+  const input = ac.createGain(), out = gainTo(to || musicBus, level);
+  let node = input;
+  if (drive) {
+    const hp = filt('highpass', 110), sh = ac.createWaveShaper();
+    sh.curve = distCurve(drive); sh.oversample = '2x';
+    node.connect(hp); hp.connect(sh); node = sh;
+  }
+  const l = filt('lowpass', lp, .7), pk = filt('peaking', 1700, 1); pk.gain.value = drive ? 3 : 0;
+  node.connect(l); l.connect(pk); pk.connect(out);
+  if (send) out.connect(gainTo(rev, send));
+  if (delay) {
+    const d = ac.createDelay(1), fb = ac.createGain();
+    d.delayTime.value = .28; fb.gain.value = .27;
+    out.connect(d); d.connect(fb); fb.connect(d); d.connect(gainTo(musicBus, delay));
+  }
+  return input;
+}
+function initAudio() {
+  if (ac) return;
+  ac = new (window.AudioContext || window.webkitAudioContext)({ latencyHint: 'interactive' });
+  const comp = ac.createDynamicsCompressor();
+  comp.threshold.value = -16; comp.knee.value = 10; comp.ratio.value = 3.5; comp.attack.value = .004; comp.release.value = .2;
+  const master = gainTo(comp, .9); comp.connect(ac.destination);
+  musicBus = gainTo(master, 1); sfxBus = gainTo(master, .8);
+  // reverb
+  const len = Math.floor(ac.sampleRate * 2.2), imp = ac.createBuffer(2, len, ac.sampleRate);
+  for (let ch = 0; ch < 2; ch++) { const d = imp.getChannelData(ch); for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 2.8); }
+  rev = ac.createConvolver(); rev.buffer = imp; rev.connect(gainTo(musicBus, .3));
+  noiseBuf = ac.createBuffer(1, ac.sampleRate * 2, ac.sampleRate);
+  const nd = noiseBuf.getChannelData(0); for (let i = 0; i < nd.length; i++) nd[i] = Math.random() * 2 - 1;
+  B.drums = gainTo(musicBus, .85);
+  B.drumVerb = gainTo(rev, .25); B.drums.connect(B.drumVerb);
+  B.bass = makeBus({ drive: 3, lp: 1400, level: .55 });
+  B.rhythm = makeBus({ drive: 55, lp: 3000, level: .15, send: .15 });
+  B.pad = makeBus({ lp: 4200, level: .42, send: .35 });
+  B.leadDrive = makeBus({ drive: 140, lp: 4800, level: .2, send: .25, delay: .18 });
+  B.leadClean = makeBus({ lp: 5500, level: .55, send: .3, delay: .2 });
+  B.fail = makeBus({ drive: 90, lp: 2500, level: .25, to: sfxBus });
+}
+function track(n) { live.add(n); n.onended = () => live.delete(n); return n; }
+function osc(type, f, when) { const o = ac.createOscillator(); o.type = type; o.frequency.value = f; o.start(when); return track(o); }
+function noise(when, dur, offset) {
+  const n = ac.createBufferSource(); n.buffer = noiseBuf;
+  n.start(when, offset != null ? offset : Math.random() * (2 - dur - .01)); n.stop(when + dur);
+  return track(n);
+}
+function killAll() {
+  if (!ac) return;
+  const t = ac.currentTime + .02;
+  live.forEach(n => { try { n.stop(t); } catch (e) { /* not started */ } });
+  live.clear();
+}
+
+/* guitar-ish voice: dest bus, returns { release(t) } */
+function gtrVoice(dest, midi, when, dur, vel, opts = {}) {
+  const f = mtof(midi), g = ac.createGain(); g.gain.value = 0; g.connect(dest);
+  const clean = !!opts.clean;
+  const o1 = osc('sawtooth', f, when), o2 = osc(clean ? 'triangle' : 'sawtooth', f, when);
+  o2.detune.value = clean ? 0 : 9;
+  if (clean) {
+    const lp = filt('lowpass', Math.min(7000, f * 10), 1.5);
+    lp.frequency.setValueAtTime(Math.min(7000, f * 10), when);
+    lp.frequency.setTargetAtTime(Math.max(500, f * 2.4), when + .01, opts.pad ? .9 : .28);
+    o1.connect(lp); o2.connect(lp); lp.connect(g);
+  } else { o1.connect(g); o2.connect(g); }
+  const oscs = [o1, o2];
+  if (opts.vib) {
+    const lfo = osc('sine', 5.4, when + .3), lg = ac.createGain();
+    lg.gain.setValueAtTime(0, when); lg.gain.linearRampToValueAtTime(f * .008, when + .7);
+    lfo.connect(lg); lg.connect(o1.frequency); lg.connect(o2.frequency); oscs.push(lfo);
+  }
+  g.gain.setValueAtTime(0, when);
+  g.gain.linearRampToValueAtTime(vel, when + (opts.pad ? .03 : .004));
+  if (clean) g.gain.setTargetAtTime(vel * (opts.pad ? .45 : .18), when + .02, opts.pad ? 1.4 : .55);
+  else g.gain.setTargetAtTime(vel * .72, when + .02, .3);
+  const v = {
+    released: false,
+    release(t) {
+      if (v.released) return; v.released = true;
+      t = Math.max(t, when + .03);
+      g.gain.cancelScheduledValues(t); g.gain.setTargetAtTime(0, t, .04);
+      oscs.forEach(o => { try { o.stop(t + .35); } catch (e) { /* already stopped */ } });
+    },
+  };
+  if (dur != null) v.release(when + dur);
+  return v;
+}
+function bassVoice(midi, when, dur, vel) {
+  const f = mtof(midi), g = ac.createGain(); g.gain.value = 0; g.connect(B.bass);
+  const o = osc('sawtooth', f, when), s = osc('sine', f, when), lp = filt('lowpass', 900, 3);
+  lp.frequency.setValueAtTime(1000, when); lp.frequency.setTargetAtTime(350, when + .01, .12);
+  o.connect(lp); lp.connect(g); s.connect(gainTo(g, .9));
+  g.gain.setValueAtTime(0, when); g.gain.linearRampToValueAtTime(vel, when + .006);
+  g.gain.setTargetAtTime(vel * .55, when + .02, .25);
+  g.gain.setTargetAtTime(0, when + dur, .03);
+  o.stop(when + dur + .25); s.stop(when + dur + .25);
+}
+function env(g, when, peak, end) { g.gain.setValueAtTime(peak, when); g.gain.exponentialRampToValueAtTime(.001, end); }
+const drum = {
+  kick(w, v) {
+    const o = osc('sine', 150, w), g = gainTo(B.drums, 0);
+    o.frequency.setValueAtTime(155, w); o.frequency.exponentialRampToValueAtTime(44, w + .11);
+    o.connect(g); env(g, w, v * 1.1, w + .38); o.stop(w + .4);
+    const n = noise(w, .015), ng = gainTo(B.drums, 0), hp = filt('highpass', 2500);
+    n.connect(hp); hp.connect(ng); env(ng, w, v * .25, w + .015);
+  },
+  snare(w, v) {
+    const n = noise(w, .22), hp = filt('highpass', 1100), g = gainTo(B.drums, 0);
+    n.connect(hp); hp.connect(g); env(g, w, v * .75, w + .2);
+    const o = osc('triangle', 195, w), og = gainTo(B.drums, 0);
+    o.frequency.exponentialRampToValueAtTime(150, w + .08); o.connect(og); env(og, w, v * .5, w + .1); o.stop(w + .12);
+  },
+  hat(w, v) { const n = noise(w, .05), hp = filt('highpass', 7800), g = gainTo(B.drums, 0); n.connect(hp); hp.connect(g); env(g, w, v * .26, w + .045); },
+  ohat(w, v) { const n = noise(w, .3), hp = filt('highpass', 6500), g = gainTo(B.drums, 0); n.connect(hp); hp.connect(g); env(g, w, v * .22, w + .26); },
+  crash(w, v) {
+    const n = noise(w, 1.9, 0), hp = filt('highpass', 3800), bp = filt('peaking', 6000, .8), g = gainTo(B.drums, 0);
+    bp.gain.value = 6; n.connect(hp); hp.connect(bp); bp.connect(g); env(g, w, v * .38, w + 1.85);
+  },
+  tom(w, v, p) {
+    const f0 = 150 - (p || 0) * 8, o = osc('sine', f0, w), g = gainTo(B.drums, 0);
+    o.frequency.exponentialRampToValueAtTime(f0 * .58, w + .22); o.connect(g); env(g, w, v * .9, w + .32); o.stop(w + .34);
+  },
+  stick(w, v) {
+    const o = osc('square', v > .9 ? 2100 : 1600, w), bp = filt('bandpass', 2000, 4), g = gainTo(musicBus, 0);
+    o.connect(bp); bp.connect(g); env(g, w, .22 * v, w + .04); o.stop(w + .05);
+  },
+};
+function playEvent(ev, when, spb) {
+  switch (ev.k) {
+    case 'gtr': ev.notes.forEach(m => gtrVoice(B.rhythm, m, when, ev.dur * spb, ev.v)); break;
+    case 'pad': ev.notes.forEach(m => gtrVoice(B.pad, m, when, ev.dur * spb, ev.v, { clean: true, pad: true })); break;
+    case 'bass': bassVoice(ev.m, when, ev.dur * spb, ev.v); break;
+    default: if (drum[ev.k]) drum[ev.k](when, ev.v, ev.p);
+  }
+}
+function playLead(tile, when, durSec, hold) {
+  const clean = tile.tone === 'clean';
+  const dest = clean ? B.leadClean : B.leadDrive;
+  const vel = (clean ? .5 : .55) / Math.sqrt(tile.midi.length);
+  return tile.midi.map(m => gtrVoice(dest, m, when, durSec, vel, { clean, vib: hold && !clean }));
+}
+function clunk() {
+  const w = ac.currentTime, n = noise(w, .09), lp = filt('lowpass', 500), g = gainTo(sfxBus, 0);
+  n.connect(lp); lp.connect(g); env(g, w, .5, w + .09);
+  const o = osc('sawtooth', 82, w), og = gainTo(B.fail, 0); o.connect(og); env(og, w, .4, w + .14); o.stop(w + .16);
+}
+function failSound() {
+  const w = ac.currentTime + .02;
+  [40, 41, 47, 52].forEach((m, i) => { const v = gtrVoice(B.fail, m, w + i * .015, .9, .35); v.release(w + .9); });
+  const o = osc('sawtooth', 220, w), g = gainTo(B.fail, 0);
+  o.frequency.exponentialRampToValueAtTime(55, w + .7); o.connect(g); env(g, w, .25, w + .75); o.stop(w + .8);
+}
+
+/* =========================================================
+   GAME
+   ========================================================= */
+const $ = s => document.querySelector(s);
+const cv = $('#cv'), gx = cv.getContext('2d');
+const COL = { paper: '#f3f1ea', ink: '#131216', red: '#e2272d', amber: '#ffb420', amberDeep: '#b86e00', soft: '#5d5965' };
+const PTS = { perfect: 100, great: 70, good: 40 };
+const store = {
+  get(k) { try { return JSON.parse(localStorage.getItem('riff-tiles:' + k)); } catch (e) { return null; } },
+  set(k, v) { try { localStorage.setItem('riff-tiles:' + k, JSON.stringify(v)); } catch (e) { /* storage blocked */ } },
+};
+const pref = store.get('pref') || {};
+const G = {
+  state: 'menu', song: null, speed: SPEEDS.find(s => s.id === pref.speed) || SPEEDS[1], mode: pref.mode === 'jam' ? 'jam' : 'classic',
+  tiles: [], backing: [], marks: [], length: 0, bi: 0, t0: 0, spb: .5, lat: 0, next: 0,
+  score: 0, combo: 0, maxCombo: 0, counts: {}, holds: new Map(), flashes: [], judge: null, fail: null,
+  frozen: 0, W: 0, H: 0, hitY: 0, ppb: 1, dpr: 1, finishedAt: 0,
+};
+
+let lastCtxT = -1, lastPerf = 0;
+function audioNow() {
+  const c = ac.currentTime, p = performance.now();
+  if (c !== lastCtxT) { lastCtxT = c; lastPerf = p; return c; }
+  return c + Math.min(.04, (p - lastPerf) / 1000);
+}
+function beatNow() {
+  if (G.state === 'playing') return (audioNow() - G.lat - G.t0) / G.spb;
+  if (G.state === 'failing' && G.fail) {
+    const k = Math.min(1, (performance.now() - G.fail.start) / 380), e = 1 - Math.pow(1 - k, 3);
+    return G.fail.from + (G.fail.to - G.fail.from) * e;
+  }
+  return G.frozen;
+}
+const mult = () => 1 + Math.min(3, Math.floor(G.combo / 10));
+
+function resize() {
+  const r = cv.getBoundingClientRect();
+  G.dpr = Math.min(2.5, window.devicePixelRatio || 1);
+  G.W = r.width; G.H = r.height;
+  cv.width = Math.round(r.width * G.dpr); cv.height = Math.round(r.height * G.dpr);
+  G.hitY = G.H * .8;
+  G.ppb = G.song ? G.hitY / G.song.view : 100;
+}
+new ResizeObserver(resize).observe(cv);
+
+function prepare(song) {
+  G.song = song;
+  const built = song.built;
+  G.tiles = built.tiles.map(t => ({ ...t, state: 'live', held: 0 }));
+  G.backing = built.backing; G.marks = built.marks; G.length = built.length;
+  G.spb = 60 / (song.bpm * G.speed.mult);
+  G.bi = 0; G.next = 0; G.score = 0; G.combo = 0; G.maxCombo = 0;
+  G.counts = { perfect: 0, great: 0, good: 0, miss: 0 };
+  G.holds.clear(); G.flashes = []; G.judge = null; G.fail = null;
+  G.lat = Math.min(.25, (ac.outputLatency || 0) + (ac.baseLatency || 0));
+  G.frozen = -song.countIn - (.1 + G.lat) / G.spb;
+  musicBus.gain.cancelScheduledValues(ac.currentTime);
+  musicBus.gain.setValueAtTime(1, ac.currentTime);
+  resize();
+  G.state = 'ready';
+}
+function startPlaying() {
+  ac.resume();
+  G.t0 = ac.currentTime + .1 + G.song.countIn * G.spb;
+  G.state = 'playing';
+}
+setInterval(() => {
+  if (G.state !== 'playing') return;
+  const now = ac.currentTime, horizon = now + .22;
+  while (G.bi < G.backing.length) {
+    const ev = G.backing[G.bi], t = G.t0 + ev.b * G.spb;
+    if (t > horizon) break;
+    if (t >= now - .03) playEvent(ev, Math.max(t, now), G.spb);
+    G.bi++;
+  }
+}, 25);
+
+function tileBottom(t, b) { return G.hitY + (b - t.b) * G.ppb; }
+function tileH(t) { return Math.max(8, t.hb * G.ppb - 3); }
+
+function handleTap(lane, y, id, isKey) {
+  if (G.state === 'ready') {
+    const sl = G.tiles[0].lane, top = G.hitY - startH();
+    if (isKey ? (lane === sl || lane === -1) : (lane === sl && y >= top - 20)) startPlaying();
+    return;
+  }
+  if (G.state !== 'playing' || lane < 0) return;
+  const b = beatNow(), t = G.tiles[G.next];
+  if (!t) return;
+  const bottom = tileBottom(t, b), top = bottom - tileH(t);
+  if (isKey) {
+    if (t.b - b > 1.25) return;
+    if (lane === t.lane) return hit(t, b, id);
+    return wrong(lane, (top + bottom) / 2);
+  }
+  if (bottom <= 0) return;
+  if (lane === t.lane && y >= top - 30) return hit(t, b, id);
+  for (let i = G.next + 1; i < Math.min(G.tiles.length, G.next + 12); i++) {
+    const u = G.tiles[i], ub = tileBottom(u, b);
+    if (ub < 0) break;
+    if (u.lane === lane && y >= ub - tileH(u) - 10 && y <= ub + 10) return;
+  }
+  if (y >= top - 10) wrong(lane, y);
+}
+function hit(t, b, id) {
+  const err = (b - t.b) * G.spb, ae = Math.abs(err);
+  const j = ae <= .075 ? 'perfect' : ae <= .15 ? 'great' : 'good';
+  G.counts[j]++; G.combo++; G.maxCombo = Math.max(G.maxCombo, G.combo);
+  G.score += PTS[j] * mult();
+  t.state = 'hit'; G.next++;
+  const now = ac.currentTime, noteAt = G.t0 + t.b * G.spb;
+  const when = err < 0 && err > -.2 ? Math.max(now, noteAt) : now;
+  if (t.hold) {
+    t.holding = true;
+    G.holds.set(id, { tile: t, voices: playLead(t, when, null, true) });
+  } else {
+    playLead(t, when, Math.min(2, Math.max(.18, t.dur * G.spb * 1.3)), false);
+  }
+  const bottom = tileBottom(t, b);
+  G.flashes.push({ lane: t.lane, y0: bottom - tileH(t), y1: bottom, at: performance.now(), red: false });
+  G.judge = { text: j === 'perfect' ? 'Perfect' : j === 'great' ? 'Great' : 'Good', j, at: performance.now() };
+}
+function endHold(id, complete) {
+  const h = G.holds.get(id); if (!h) return;
+  const t = h.tile, at = complete ? G.t0 + (t.b + t.dur) * G.spb : ac.currentTime;
+  h.voices.forEach(v => v.release(at));
+  t.holding = false; t.holdDone = true;
+  if (complete) t.held = 1;
+  G.score += Math.round(30 * t.dur * t.held) * mult();
+  G.holds.delete(id);
+}
+function wrong(lane, y) {
+  if (G.mode === 'classic') return fail({ kind: 'cell', lane, y });
+  clunk(); G.combo = 0;
+  G.flashes.push({ lane, y0: y - G.ppb * .4, y1: y + G.ppb * .4, at: performance.now(), red: true });
+}
+function fail(info) {
+  const b = beatNow();
+  G.holds.forEach((h, id) => endHold(id, false));
+  G.fail = { ...info, start: performance.now(), from: b, to: b };
+  if (info.kind === 'tile') G.fail.to = info.tile.b + (G.H * .6 - G.hitY) / G.ppb;
+  G.state = 'failing';
+  const t = ac.currentTime;
+  musicBus.gain.cancelScheduledValues(t); musicBus.gain.setValueAtTime(musicBus.gain.value, t);
+  musicBus.gain.linearRampToValueAtTime(0, t + .12);
+  setTimeout(killAll, 160);
+  failSound();
+  if (navigator.vibrate) { try { navigator.vibrate(120); } catch (e) { /* unsupported */ } }
+  setTimeout(() => showResults(false), 1500);
+}
+function finish() {
+  G.state = 'done'; G.frozen = beatNow();
+  const t = ac.currentTime;
+  musicBus.gain.cancelScheduledValues(t); musicBus.gain.setValueAtTime(1, t); musicBus.gain.linearRampToValueAtTime(0, t + 2.2);
+  setTimeout(killAll, 2300);
+  setTimeout(() => showResults(true), 700);
+}
+
+function update(b) {
+  if (G.state !== 'playing') return;
+  G.holds.forEach((h, id) => {
+    const t = h.tile;
+    t.held = Math.max(0, Math.min(1, (b - t.b) / t.dur));
+    if (b >= t.b + t.dur) endHold(id, true);
+  });
+  while (G.next < G.tiles.length) {
+    const t = G.tiles[G.next];
+    const late = (G.H - G.hitY) / G.ppb + Math.min(t.hb, 1) * .5;
+    if (b - t.b <= late) break;
+    if (G.mode === 'classic') return fail({ kind: 'tile', tile: t });
+    t.state = 'miss'; G.counts.miss++; G.combo = 0; G.next++; clunk();
+  }
+  if (G.next >= G.tiles.length && G.holds.size === 0 && b >= G.length + .5) finish();
+}
+
+/* ---------- drawing ---------- */
+function rr(x, y, w, h, r) {
+  gx.beginPath();
+  if (gx.roundRect) gx.roundRect(x, y, w, h, r); else gx.rect(x, y, w, h);
+  gx.fill();
+}
+function startH() { return Math.max(G.H * .17, G.ppb * .9); }
+function draw(b) {
+  const W = G.W, H = G.H, lw = W / 4, now = performance.now();
+  gx.setTransform(G.dpr, 0, 0, G.dpr, 0, 0);
+  gx.fillStyle = COL.paper; gx.fillRect(0, 0, W, H);
+  // beat pulse under the strum zone
+  const playing = G.state === 'playing' && b >= 0;
+  const pulse = playing ? Math.pow(1 - (b - Math.floor(b)), 4) : 0;
+  gx.fillStyle = `rgba(255,180,32,${.05 + pulse * .14})`; gx.fillRect(0, G.hitY, W, H - G.hitY);
+  gx.fillStyle = 'rgba(19,18,22,.09)';
+  for (let i = 1; i < 4; i++) gx.fillRect(Math.round(i * lw) - .5, 0, 1, H);
+  gx.fillStyle = 'rgba(19,18,22,.14)'; gx.fillRect(0, G.hitY, W, 1);
+
+  // count-in numbers
+  if (G.state === 'playing' && b < 0 && b >= -G.song.countIn) {
+    gx.fillStyle = 'rgba(19,18,22,.12)';
+    gx.font = `400 ${Math.round(W * .38)}px 'Bowlby One SC', Impact, sans-serif`;
+    gx.textAlign = 'center'; gx.textBaseline = 'middle';
+    gx.fillText(String(Math.ceil(-b)), W / 2, H * .42);
+  }
+
+  // tiles
+  for (const t of G.tiles) {
+    const bottom = tileBottom(t, b), h = tileH(t), top = bottom - h;
+    if (bottom < -2) break;
+    if (top > H) continue;
+    const x = t.lane * lw + 1.5, w = lw - 3;
+    const failing = G.fail && G.fail.kind === 'tile' && G.fail.tile === t;
+    if (failing) {
+      const on = Math.floor((now - G.fail.start) / 140) % 2 === 0;
+      gx.fillStyle = on ? COL.red : COL.ink; rr(x, top, w, h, 4); continue;
+    }
+    if (t.state === 'miss') { gx.fillStyle = 'rgba(226,39,45,.35)'; rr(x, top, w, h, 4); continue; }
+    if (t.state === 'hit' && !t.holding) {
+      gx.fillStyle = t.hold ? 'rgba(184,110,0,.22)' : 'rgba(19,18,22,.1)'; rr(x, top, w, h, 4); continue;
+    }
+    gx.fillStyle = COL.ink; rr(x, top, w, h, 4);
+    gx.fillStyle = 'rgba(255,255,255,.07)'; gx.fillRect(x + 4, top + 3, w - 8, 2);
+    if (t.hold) {
+      gx.fillStyle = 'rgba(255,180,32,.55)'; gx.fillRect(x + w / 2 - 1, top + 12, 2, Math.max(0, h - 34));
+      if (t.holding) {
+        const fh = h * t.held;
+        const grd = gx.createLinearGradient(0, bottom - fh, 0, bottom);
+        grd.addColorStop(0, 'rgba(255,180,32,.95)'); grd.addColorStop(1, 'rgba(255,120,20,.95)');
+        gx.fillStyle = grd; rr(x, bottom - fh, w, fh, 4);
+      }
+      gx.fillStyle = COL.amber; gx.beginPath(); gx.arc(x + w / 2, bottom - 16, 7, 0, Math.PI * 2); gx.fill();
+    }
+    if (t.midi.length === 3 && t.midi[2] - t.midi[0] === 12) {
+      // power chord marker
+      gx.fillStyle = 'rgba(255,180,32,.8)';
+      gx.fillRect(x + 8, bottom - 8, w - 16, 3);
+    }
+  }
+
+  // start tile
+  if (G.state === 'ready') {
+    const x = G.tiles[0].lane * lw + 1.5, w = lw - 3, h = startH(), top = G.hitY - h;
+    gx.fillStyle = COL.amber; rr(x, top, w, h, 4);
+    gx.fillStyle = COL.ink; gx.textAlign = 'center'; gx.textBaseline = 'middle';
+    gx.font = `400 ${Math.round(Math.min(lw * .2, 22))}px 'Bowlby One SC', Impact, sans-serif`;
+    gx.fillText('START', x + w / 2, top + h / 2);
+    gx.font = `600 13px 'IBM Plex Mono', monospace`; gx.fillStyle = COL.soft;
+    gx.fillText(`${G.song.title} · ${G.speed.label} ${G.speed.mult}×`, W / 2, H * .3);
+    gx.fillText(G.mode === 'classic' ? 'Classic: one mistake ends it' : 'Jam: play through misses', W / 2, H * .3 + 20);
+  }
+
+  // flashes
+  G.flashes = G.flashes.filter(f => now - f.at < 220);
+  for (const f of G.flashes) {
+    const a = 1 - (now - f.at) / 220;
+    gx.fillStyle = f.red ? `rgba(226,39,45,${a * .6})` : `rgba(255,180,32,${a * .55})`;
+    gx.fillRect(f.lane * lw, f.y0, lw, f.y1 - f.y0);
+  }
+  // wrong-cell fail
+  if (G.fail && G.fail.kind === 'cell') {
+    const on = Math.floor((now - G.fail.start) / 140) % 2 === 0;
+    if (on) { gx.fillStyle = COL.red; gx.fillRect(G.fail.lane * lw + 1.5, G.fail.y - G.ppb * .45, lw - 3, G.ppb * .9); }
+  }
+
+  // judgement
+  if (G.judge && now - G.judge.at < 600) {
+    const k = (now - G.judge.at) / 600;
+    gx.globalAlpha = 1 - k;
+    gx.fillStyle = G.judge.j === 'perfect' ? COL.amberDeep : G.judge.j === 'great' ? COL.ink : COL.soft;
+    gx.font = `400 ${Math.round(26 + 8 * (1 - k))}px 'Bowlby One SC', Impact, sans-serif`;
+    gx.textAlign = 'center'; gx.textBaseline = 'middle';
+    gx.fillText(G.judge.text, W / 2, G.hitY - 46 - k * 16);
+    gx.globalAlpha = 1;
+  }
+
+  // HUD
+  const prog = Math.max(0, Math.min(1, b / G.length));
+  gx.fillStyle = 'rgba(19,18,22,.1)'; gx.fillRect(0, 0, W, 5);
+  gx.fillStyle = COL.amber; gx.fillRect(0, 0, W * prog, 5);
+  if (G.state !== 'ready') {
+    gx.textAlign = 'center'; gx.textBaseline = 'top';
+    gx.fillStyle = COL.red; gx.font = `400 44px 'Bowlby One SC', Impact, sans-serif`;
+    gx.fillText(G.score.toLocaleString(), W / 2, 16);
+    const m = mult();
+    gx.font = `600 13px 'IBM Plex Mono', monospace`;
+    gx.fillStyle = m > 1 ? COL.amberDeep : COL.soft;
+    gx.fillText(G.combo > 1 ? `${G.combo} streak · ${m}×` : ' ', W / 2, 68);
+    let name = '';
+    for (const mk of G.marks) { if (mk.b <= b) name = mk.name; else break; }
+    gx.textAlign = 'right'; gx.fillStyle = COL.soft; gx.font = `600 11px 'IBM Plex Mono', monospace`;
+    gx.fillText(name.toUpperCase(), W - 12, 22);
+  }
+}
+
+function loop() {
+  requestAnimationFrame(loop);
+  if (G.state === 'menu' || !G.song) return;
+  const b = beatNow();
+  update(b);
+  if (G.state === 'menu') return;
+  draw(beatNow());
+  const p = G.state === 'playing' && b >= 0 ? Math.pow(1 - (b - Math.floor(b)), 3) : 0;
+  lightL.style.opacity = (.25 + p * .55).toFixed(3);
+  lightR.style.opacity = (.2 + (Math.floor(b) % 2 ? p : 0) * .6).toFixed(3);
+}
+const lightL = $('#lightL'), lightR = $('#lightR');
+requestAnimationFrame(loop);
+
+/* ---------- input ---------- */
+function laneAt(x) { return Math.max(0, Math.min(3, Math.floor(x / (G.W / 4)))); }
+cv.addEventListener('pointerdown', e => {
+  e.preventDefault();
+  const r = cv.getBoundingClientRect();
+  handleTap(laneAt(e.clientX - r.left), e.clientY - r.top, 'p' + e.pointerId, false);
+});
+['pointerup', 'pointercancel'].forEach(ev => cv.addEventListener(ev, e => endHold('p' + e.pointerId, false)));
+const KEYS = { KeyD: 0, KeyF: 1, KeyJ: 2, KeyK: 3 };
+window.addEventListener('keydown', e => {
+  if (G.state === 'menu') return;
+  if (e.code === 'Escape' || e.code === 'KeyP') { if (G.state === 'playing') pause(); else if (G.state === 'paused') resume(); return; }
+  if (e.repeat) return;
+  if (e.code in KEYS) { e.preventDefault(); handleTap(KEYS[e.code], G.H, 'k' + e.code, true); }
+  else if ((e.code === 'Space' || e.code === 'Enter') && G.state === 'ready') { e.preventDefault(); handleTap(-1, 0, 'k', true); }
+});
+window.addEventListener('keyup', e => { if (e.code in KEYS) endHold('k' + e.code, false); });
+
+/* ---------- pause ---------- */
+let resumeTimer = null;
+function pause() {
+  if (G.state !== 'playing') return;
+  G.frozen = beatNow();
+  G.holds.forEach((h, id) => endHold(id, false));
+  G.state = 'paused';
+  ac.suspend();
+  $('#pauseTitle').textContent = G.song.title;
+  $('#pauseCount').hidden = true; $('#pauseActions').hidden = false;
+  $('#pause').hidden = false;
+}
+function resume() {
+  if (G.state !== 'paused' || resumeTimer) return;
+  $('#pauseActions').hidden = true; $('#pauseCount').hidden = false;
+  let n = 3; $('#pauseCount').textContent = n;
+  resumeTimer = setInterval(() => {
+    n--;
+    if (n > 0) { $('#pauseCount').textContent = n; return; }
+    clearInterval(resumeTimer); resumeTimer = null;
+    $('#pause').hidden = true;
+    ac.resume().then(() => { G.state = 'playing'; });
+  }, 500);
+}
+$('#pauseBtn').addEventListener('click', () => { if (G.state === 'playing') pause(); else if (G.state === 'ready') toMenu(); });
+$('#pResume').addEventListener('click', resume);
+$('#pRestart').addEventListener('click', () => { $('#pause').hidden = true; ac.resume(); killAll(); play(); });
+$('#pQuit').addEventListener('click', () => { $('#pause').hidden = true; ac.resume(); killAll(); toMenu(); });
+document.addEventListener('visibilitychange', () => { if (document.hidden) pause(); });
+
+/* ---------- menu / sheet / results ---------- */
+function bestKey(song, speed, mode) { return `best:${song.id}:${speed.id}:${mode}`; }
+function bestStars(song) {
+  let s = 0;
+  for (const sp of SPEEDS) for (const m of ['classic', 'jam']) { const v = store.get(bestKey(song, sp, m)); if (v) s = Math.max(s, v.stars); }
+  return s;
+}
+function starStr(n) { return '★'.repeat(n) + '☆'.repeat(3 - n); }
+function level(song) {
+  const sec = song.built.length * 60 / song.bpm, tps = song.built.tiles.length / sec;
+  return tps < 2.3 ? 'Easy' : tps < 3.2 ? 'Medium' : 'Hard';
+}
+function renderMenu() {
+  $('#songList').innerHTML = SONGS.map((s, i) => `
+    <li><button class="song" data-i="${i}">
+      <span class="no">${String(i + 1).padStart(2, '0')}</span>
+      <span class="name"><b>${s.title}</b><small>${s.artist} · ${s.year}</small></span>
+      <span class="meta"><span class="lvl">${level(s)}</span><span>${s.bpm} BPM</span><span>${s.built.tiles.length} tiles</span><span class="stars-sm" aria-label="Best ${bestStars(s)} of 3 stars">${starStr(bestStars(s))}</span></span>
+    </button></li>`).join('');
+}
+$('#songList').addEventListener('click', e => {
+  const btn = e.target.closest('.song'); if (!btn) return;
+  openSheet(SONGS[+btn.dataset.i]);
+});
+let sheetSong = null;
+function openSheet(song) {
+  sheetSong = song;
+  const i = SONGS.indexOf(song);
+  $('#sheetNo').textContent = `Song ${i + 1} · ${level(song)}`;
+  $('#sheetTitle').textContent = song.title;
+  $('#sheetArtist').textContent = `${song.artist} · ${song.year}`;
+  $('#speedSeg').innerHTML = SPEEDS.map(sp => `
+    <button class="opt" id="speed-${sp.id}" data-speed="${sp.id}" aria-pressed="${sp === G.speed}">
+      <b>${sp.label}</b><small>${sp.mult}× · ${Math.round(song.bpm * sp.mult)} BPM</small>
+    </button>`).join('');
+  syncSheet();
+  $('#sheet').hidden = false;
+  $('#sheetPlay').focus();
+}
+function syncSheet() {
+  document.querySelectorAll('#speedSeg .opt').forEach(b => b.setAttribute('aria-pressed', b.dataset.speed === G.speed.id));
+  document.querySelectorAll('#modeSeg .opt').forEach(b => b.setAttribute('aria-pressed', b.dataset.mode === G.mode));
+  const best = store.get(bestKey(sheetSong, G.speed, G.mode));
+  $('#sheetBest').textContent = best ? `Best on this setting: ${best.score.toLocaleString()} · ${starStr(best.stars)}` : 'No score yet on this setting';
+}
+$('#speedSeg').addEventListener('click', e => {
+  const b = e.target.closest('.opt'); if (!b) return;
+  G.speed = SPEEDS.find(s => s.id === b.dataset.speed); savePref(); syncSheet();
+});
+$('#modeSeg').addEventListener('click', e => {
+  const b = e.target.closest('.opt'); if (!b) return;
+  G.mode = b.dataset.mode; savePref(); syncSheet();
+});
+function savePref() { store.set('pref', { speed: G.speed.id, mode: G.mode }); }
+$('#sheetBack').addEventListener('click', () => { $('#sheet').hidden = true; });
+$('#sheet').addEventListener('click', e => { if (e.target.id === 'sheet') $('#sheet').hidden = true; });
+$('#sheetPlay').addEventListener('click', () => { $('#sheet').hidden = true; play(sheetSong); });
+
+function play(song) {
+  initAudio(); ac.resume();
+  $('#menu').hidden = true; $('#results').hidden = true; $('#game').hidden = false;
+  prepare(song || G.song);
+}
+function toMenu() {
+  G.state = 'menu';
+  $('#game').hidden = true; $('#results').hidden = true; $('#menu').hidden = false;
+  renderMenu();
+}
+function showResults(complete) {
+  const total = G.tiles.length, hits = G.counts.perfect + G.counts.great + G.counts.good;
+  const pct = hits / total;
+  let stars;
+  if (G.mode === 'classic') stars = complete ? 3 : pct >= .66 ? 2 : pct >= .33 ? 1 : 0;
+  else stars = pct >= .95 ? 3 : pct >= .8 ? 2 : pct >= .5 ? 1 : 0;
+  const key = bestKey(G.song, G.speed, G.mode), prev = store.get(key);
+  const isBest = !prev || G.score > prev.score;
+  if (isBest) store.set(key, { score: G.score, stars: Math.max(stars, prev ? prev.stars : 0) });
+  else if (stars > prev.stars) store.set(key, { ...prev, stars });
+  const fc = complete && G.counts.miss === 0 && G.counts.good === 0;
+  const head = complete ? (fc ? 'Full combo' : 'Song complete') : 'Missed a tile';
+  $('#resCard').innerHTML = `
+    <div>
+      <p class="eyebrow">${head}</p>
+      <h2>${G.song.title}</h2>
+      <p class="sub">${G.song.artist} · ${G.speed.label} ${G.speed.mult}× · ${G.mode === 'classic' ? 'Classic' : 'Jam'}</p>
+    </div>
+    <div class="stars" aria-label="${stars} of 3 stars">${'★'.repeat(stars)}<span class="off">${'★'.repeat(3 - stars)}</span></div>
+    <div>
+      <div class="big-score">${G.score.toLocaleString()}</div>
+      <p class="best-line">${isBest ? (prev ? 'New best on this setting' : 'First score on this setting') : `Best ${prev.score.toLocaleString()}`}</p>
+    </div>
+    <dl class="stats">
+      <div><dt>Perfect</dt><dd>${G.counts.perfect}</dd></div>
+      <div><dt>Great</dt><dd>${G.counts.great}</dd></div>
+      <div><dt>Good</dt><dd>${G.counts.good}</dd></div>
+      <div><dt>Tiles</dt><dd>${hits}/${total}</dd></div>
+      <div><dt>Missed</dt><dd>${G.mode === 'classic' && !complete ? 1 : G.counts.miss}</dd></div>
+      <div><dt>Best streak</dt><dd>${G.maxCombo}</dd></div>
+    </dl>
+    <div class="actions">
+      <button class="btn" id="rMenu">Setlist</button>
+      <button class="btn" id="rSpeed">Change speed</button>
+      <button class="btn primary" id="rRetry">Play again</button>
+    </div>`;
+  $('#results').hidden = false;
+  $('#rRetry').onclick = () => play();
+  $('#rMenu').onclick = toMenu;
+  $('#rSpeed').onclick = () => { const s = G.song; toMenu(); openSheet(s); };
+  $('#rRetry').focus();
+}
+
+renderMenu();
+})();
+</script>
