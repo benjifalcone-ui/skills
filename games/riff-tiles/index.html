@@ -164,6 +164,15 @@ kbd { font-family: var(--f-mono); font-size: 12px; border: 1px solid #4a4552; bo
 .stats div { border-top: 1px solid rgba(19, 18, 22, .2); padding-top: 6px; }
 .stats dt { font-family: var(--f-mono); font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-soft); }
 .stats dd { margin: 0; font-size: 24px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.track-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 8px; font-size: 15px; color: var(--ink-soft); }
+.track-row span { min-width: 0; overflow-wrap: anywhere; }
+.link { background: none; border: 0; padding: 0; color: var(--ink); font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
+.nudge { display: grid; grid-template-columns: auto 1fr auto; gap: 10px; align-items: center; margin-top: 10px; }
+.nudge .label { margin: 0; }
+.nudge input { width: 100%; accent-color: var(--ink); }
+.nudge output { font-family: var(--f-mono); font-size: 12px; min-width: 6ch; text-align: right; color: var(--ink-soft); }
+.meter { height: 6px; background: var(--paper-2); border-radius: 3px; overflow: hidden; }
+.meter i { display: block; height: 100%; width: 0; background: var(--amber-deep); }
 .countdown { font-family: var(--f-display); font-size: 96px; color: var(--amber); text-align: center; line-height: 1; }
 
 /* ---------- Game ---------- */
@@ -211,7 +220,7 @@ kbd { font-family: var(--f-mono); font-size: 12px; border: 1px solid #4a4552; bo
       <div><b>Hold</b>Long tiles ring out while you keep your finger down.</div>
       <div><b>Keys</b><kbd>D</kbd> <kbd>F</kbd> <kbd>J</kbd> <kbd>K</kbd> play the four lanes. <kbd>Esc</kbd> pauses.</div>
     </div>
-    <p class="fine">Each chart follows the real song's sections, tempo, chords and guitar parts, played by a band synthesized live in your browser. No recordings or vocals are used, and solos are freshly generated in the song's style. Headphones help: the rhythm guitars are panned left and right.</p>
+    <p class="fine">Each chart follows the real song's sections, tempo, chords and guitar parts, played by a band synthesized live in your browser. No recordings or vocals are included, and solos are freshly generated in the song's style. For Everlong you can load your own copy of the instrumental; it stays on your device. Headphones help: the rhythm guitars are panned left and right.</p>
   </div>
 </section>
 
@@ -242,6 +251,23 @@ kbd { font-family: var(--f-mono); font-size: 12px; border: 1px solid #4a4552; bo
         <button class="opt" id="mode-jam" data-mode="jam"><b>Jam</b><small>Play through misses</small></button>
       </div>
     </div>
+    <div id="trackBox" hidden>
+      <p class="label">Backing</p>
+      <div class="seg two" id="backSeg">
+        <button class="opt" id="back-synth" data-back="synth"><b>Synth band</b><small>Built in</small></button>
+        <button class="opt" id="back-track" data-back="track"><b>Your recording</b><small id="trackShort">Choose an MP3</small></button>
+      </div>
+      <div class="track-row">
+        <button class="link" id="trackPick">Choose MP3</button>
+        <input type="file" id="trackFile" accept="audio/*,.mp3,.m4a,.wav" hidden>
+        <span id="trackMsg">Timed to the 4:12 instrumental. Your file stays on this device.</span>
+      </div>
+      <div class="nudge">
+        <label class="label" for="nudge">Sync</label>
+        <input type="range" id="nudge" min="-150" max="150" step="5" value="0">
+        <output id="nudgeVal" for="nudge">0 ms</output>
+      </div>
+    </div>
     <p class="best-line" id="sheetBest">No score yet on this setting</p>
     <div class="actions">
       <button class="btn" id="sheetBack">Back</button>
@@ -265,6 +291,17 @@ kbd { font-family: var(--f-mono); font-size: 12px; border: 1px solid #4a4552; bo
   </div>
 </div>
 
+<div id="loading" class="overlay" hidden>
+  <div class="card">
+    <div>
+      <p class="eyebrow">Getting ready</p>
+      <h2 id="loadTitle">Preparing your recording</h2>
+      <p class="sub" id="loadSub">Stretching the track to the new speed without changing its pitch.</p>
+    </div>
+    <div class="meter"><i id="loadBar"></i></div>
+  </div>
+</div>
+
 <div id="results" class="overlay" hidden>
   <div class="card" id="resCard"></div>
 </div>
@@ -281,9 +318,10 @@ kbd { font-family: var(--f-mono); font-size: 12px; border: 1px solid #4a4552; bo
 const EV_RD = 'D4:.5 A4:.5 E5:1 A4:.5 D5:.5 E5:1';
 const EV_RB = 'B3:.5 F#4:.5 D5:1 F#4:.5 B4:.5 D5:1';
 const EV_RG = 'G3:.5 D4:.5 B4:1 D4:.5 G4:.5 F#4:1';
-const EV_RIFF = [EV_RD, EV_RD, EV_RB, EV_RG].join(' ');
-const EV_VPROG = 'Dadd9|Dadd9|Bm7|Gmaj7';
-const EV_CPROG = 'D5|B5|G5|G5';
+// Everlong's riff cycle is seven bars long; the chorus runs 22 bars (measured from the 4:12 instrumental)
+const EV_RIFF = [EV_RD, EV_RD, EV_RB, EV_RB, EV_RG, EV_RB, EV_RB].join(' ');
+const EV_VPROG = 'Dadd9|Dadd9|Bm7|Bm7|Gmaj7|Bm7|Bm7';
+const EV_CPROG = 'D5|D5|A5|D5|D5|A5|D5|D5|B5|G5|D5|D5|B5|G5|D5|D5|B5|G5|D5|A5|G5|G5';
 
 const SNA_RIFF = 'E3~:1.5 E3~:.5 G3~:.75 E3~:.75 D3~:.5 C3~:2 B2~:2';
 const SNA_BIG = 'E3^~:1.5 E3^~:.5 G3^~:.75 E3^~:.75 D3^~:.5 C3^~:2 B2^~:2';
@@ -307,20 +345,21 @@ const EV_CHUG = { type: 'chug', rhythm: '1.5 .5 1 1' };
 const MINOR_PENT = [0, 3, 5, 7, 10], MAJOR_PENT = [0, 2, 4, 7, 9];
 const SONGS = [
   {
-    id: 'everlong', title: 'Everlong', artist: 'Foo Fighters', year: 1997, bpm: 158, view: 4, countIn: 4, tone: 'drive',
+    id: 'everlong', title: 'Everlong', artist: 'Foo Fighters', year: 1997, bpm: 157.84, view: 4, countIn: 4, tone: 'drive',
+    // beat 0 of the chart sits 0.995 s into the 4:12 instrumental; the recording holds 157.84 BPM throughout
+    track: { offset: .99466, duration: 252.58 },
     sections: [
       { name: 'Intro', prog: EV_VPROG, tone: 'crunch', lead: EV_RIFF },
-      { name: 'Intro', prog: EV_VPROG, tone: 'crunch', drums: 'groove', bass: 'root8', gtr: 'pad', lead: EV_RIFF, fill: true },
-      { name: 'Verse 1', prog: EV_VPROG, x: 4, tone: 'crunch', drums: 'groove', bass: 'root8', gtr: 'pad', lead: EV_RIFF, fill: true },
-      { name: 'Chorus', prog: EV_CPROG, x: 4, drums: 'drive', bass: 'root8', gtr: 'chug8', crash: 'each', gen: EV_CHUG, fill: true },
-      { name: 'Riff', prog: EV_VPROG, tone: 'crunch', drums: 'groove', bass: 'root8', gtr: 'pad', lead: EV_RIFF },
-      { name: 'Verse 2', prog: EV_VPROG, x: 4, tone: 'crunch', drums: 'groove', bass: 'root8', gtr: 'pad', lead: EV_RIFF, fill: true },
-      { name: 'Chorus', prog: EV_CPROG, x: 4, drums: 'drive', bass: 'root8', gtr: 'chug8', crash: 'each', gen: EV_CHUG, fill: true },
-      { name: 'Bridge', prog: 'Dadd9|Bm7|Gmaj7|Gmaj7', x: 4, tone: 'clean', drums: 'quiet', bass: 'whole', gtr: 'arp', gen: { type: 'hold', oct: 1 } },
-      { name: 'Build', prog: EV_CPROG, x: 2, drums: 'build', bass: 'root8', gtr: 'chug8', gen: { type: 'chug', rhythm: '1' }, fill: true },
-      { name: 'Last chorus', prog: EV_CPROG, x: 4, drums: 'drive', bass: 'root8', gtr: 'chug8', crash: 'each', gen: EV_CHUG, fill: true },
-      { name: 'Outro', prog: EV_VPROG, x: 2, tone: 'crunch', drums: 'groove', bass: 'root8', gtr: 'pad', lead: EV_RIFF, fill: true },
-      { name: 'End', prog: 'D5', bass: 'whole', gtr: 'hold', crash: true, lead: 'D3^:4' },
+      { name: 'Drums in', prog: EV_VPROG, tone: 'crunch', drums: 'groove', lead: EV_RIFF, fill: true },
+      { name: 'Verse 1', prog: EV_VPROG, x: 6, tone: 'crunch', drums: 'groove', bass: 'root8', gtr: 'pad', lead: EV_RIFF, fill: true },
+      { name: 'Chorus', prog: EV_CPROG, drums: 'drive', bass: 'root8', gtr: 'chug8', crash: true, gen: EV_CHUG, fill: true },
+      { name: 'Verse 2', prog: EV_VPROG, x: 3, tone: 'crunch', drums: 'groove', bass: 'root8', gtr: 'pad', lead: EV_RIFF, fill: true },
+      { name: 'Chorus', prog: EV_CPROG, drums: 'drive', bass: 'root8', gtr: 'chug8', crash: true, gen: EV_CHUG, fill: true },
+      { name: 'Bridge', prog: EV_VPROG, tone: 'clean', gtr: 'arp', gen: { type: 'hold', oct: 1 } },
+      { name: 'Build', prog: 'Dadd9|Dadd9|Bm7|Bm7', drums: 'build', bass: 'root8', gtr: 'pad', gen: { type: 'chug', rhythm: '1' }, fill: true },
+      { name: 'Build', prog: 'G5|B5|B5', drums: 'drive', bass: 'root8', gtr: 'chug8', crash: true, gen: EV_CHUG, fill: true },
+      { name: 'Last chorus', prog: EV_CPROG, drums: 'drive', bass: 'root8', gtr: 'chug8', crash: true, gen: EV_CHUG },
+      { name: 'End', prog: 'G5|-', bass: 'whole', gtr: 'hold', crash: true, lead: 'G2^:8' },
     ],
   },
   {
@@ -636,6 +675,9 @@ function initAudio() {
   B.leadDrive = makeBus({ drive: 140, lp: 4800, level: .2, send: .25, delay: .18 });
   B.leadClean = makeBus({ lp: 5500, level: .55, send: .3, delay: .2 });
   B.fail = makeBus({ drive: 90, lp: 2500, level: .25, to: sfxBus });
+  // the player's own recording: a lowpass that briefly closes on a miss
+  B.trackLP = filt('lowpass', 20000, .7); B.trackLP.connect(musicBus);
+  B.track = gainTo(B.trackLP, .95);
 }
 function track(n) { live.add(n); n.onended = () => live.delete(n); return n; }
 function osc(type, f, when) { const o = ac.createOscillator(); o.type = type; o.frequency.value = f; o.start(when); return track(o); }
@@ -757,6 +799,10 @@ function playLead(tile, when, durSec, hold) {
   const vel = (clean ? .5 : .55) / Math.sqrt(tile.midi.length);
   return tile.midi.map(m => gtrVoice(dest, m, when, durSec, vel, { clean, vib: hold && !clean, bend: tile.bend }));
 }
+function muffle() {
+  const t = ac.currentTime, f = B.trackLP.frequency;
+  f.cancelScheduledValues(t); f.setValueAtTime(650, t); f.setTargetAtTime(20000, t + .25, .18);
+}
 function clunk() {
   const w = ac.currentTime, n = noise(w, .09), lp = filt('lowpass', 500), g = gainTo(sfxBus, 0);
   n.connect(lp); lp.connect(g); env(g, w, .5, w + .09);
@@ -768,6 +814,92 @@ function failSound() {
   const o = osc('sawtooth', 220, w), g = gainTo(B.fail, 0);
   o.frequency.exponentialRampToValueAtTime(55, w + .7); o.connect(g); env(g, w, .25, w + .75); o.stop(w + .8);
 }
+
+/* =========================================================
+   YOUR RECORDINGS — files the player loads stay in this browser (IndexedDB)
+   ========================================================= */
+const TRACKS = {}; // songId -> { name, data: ArrayBuffer, decoded: AudioBuffer|null, stretched: {rate: AudioBuffer} }
+const idb = {
+  open() {
+    return new Promise((res, rej) => {
+      const r = indexedDB.open('riff-tiles', 1);
+      r.onupgradeneeded = () => r.result.createObjectStore('tracks');
+      r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error);
+    });
+  },
+  async get(k) {
+    try {
+      const db = await idb.open();
+      return await new Promise(res => { const q = db.transaction('tracks').objectStore('tracks').get(k); q.onsuccess = () => res(q.result || null); q.onerror = () => res(null); });
+    } catch (e) { return null; }
+  },
+  async set(k, v) {
+    try {
+      const db = await idb.open();
+      await new Promise(res => { const t = db.transaction('tracks', 'readwrite'); t.objectStore('tracks').put(v, k); t.oncomplete = res; t.onerror = res; });
+    } catch (e) { /* storage blocked: the file still works this session */ }
+  },
+};
+// WSOLA time-stretch: changes speed, keeps pitch. Runs in a worker so the page stays responsive.
+const STRETCH_WORKER = `
+onmessage = e => {
+  const { chans, rate } = e.data, N = 2048, Hs = 512, D = 4, TOL = 256, TL = N / D / 2;
+  const inLen = chans[0].length, outLen = Math.floor(inLen / rate);
+  const mlen = Math.floor(inLen / D), mono = new Float32Array(mlen);
+  for (let i = 0; i < mlen; i++) { let s = 0; for (const c of chans) s += c[i * D]; mono[i] = s; }
+  const win = new Float32Array(N); for (let i = 0; i < N; i++) win[i] = .5 - .5 * Math.cos(2 * Math.PI * i / N);
+  const out = chans.map(() => new Float32Array(outLen + N)), wsum = new Float32Array(outLen + N);
+  const frames = Math.floor(outLen / Hs);
+  let prev = 0;
+  for (let k = 0; k < frames; k++) {
+    const ideal = Math.round(k * Hs * rate);
+    if (ideal + N + TOL >= inLen) break;
+    let best = ideal;
+    if (k > 0) {
+      const tpl = Math.floor((prev + Hs) / D); let bestScore = -Infinity;
+      for (let d = -TOL; d <= TOL; d += D) {
+        const p = ideal + d; if (p < 0) continue;
+        const pd = Math.floor(p / D); let s = 0;
+        for (let i = 0; i < TL; i++) s += mono[pd + i] * mono[tpl + i];
+        if (s > bestScore) { bestScore = s; best = p; }
+      }
+    }
+    const o = k * Hs;
+    for (let c = 0; c < chans.length; c++) { const src = chans[c], dst = out[c]; for (let i = 0; i < N; i++) dst[o + i] += src[best + i] * win[i]; }
+    for (let i = 0; i < N; i++) wsum[o + i] += win[i];
+    prev = best;
+    if (k % 1500 === 0) postMessage({ progress: k / frames });
+  }
+  for (const dst of out) for (let i = 0; i < outLen; i++) dst[i] = wsum[i] > .05 ? dst[i] / wsum[i] : 0;
+  postMessage({ done: true, chans: out }, out.map(a => a.buffer));
+};`;
+function stretch(buffer, rate, onProgress) {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(new Blob([STRETCH_WORKER], { type: 'text/javascript' }));
+    const w = new Worker(url);
+    const chans = []; for (let c = 0; c < buffer.numberOfChannels; c++) chans.push(buffer.getChannelData(c).slice());
+    w.onmessage = e => {
+      if (e.data.progress != null) { onProgress(e.data.progress); return; }
+      const len = Math.floor(buffer.length / rate), out = ac.createBuffer(chans.length, len, buffer.sampleRate);
+      e.data.chans.forEach((d, c) => out.copyToChannel(d.subarray(0, len), c));
+      w.terminate(); URL.revokeObjectURL(url); resolve(out);
+    };
+    w.onerror = err => { w.terminate(); URL.revokeObjectURL(url); reject(err); };
+    w.postMessage({ chans, rate }, chans.map(a => a.buffer));
+  });
+}
+async function decodeTrack(id) {
+  const t = TRACKS[id];
+  if (!t.decoded) t.decoded = await ac.decodeAudioData(t.data.slice(0));
+  return t.decoded;
+}
+async function trackBuffer(song, mult, onProgress) {
+  const t = TRACKS[song.id], base = await decodeTrack(song.id);
+  if (mult === 1) return base;
+  if (!t.stretched[mult]) t.stretched[mult] = await stretch(base, mult, onProgress);
+  return t.stretched[mult];
+}
+idb.get('everlong').then(v => { if (v && v.data) TRACKS.everlong = { name: v.name, data: v.data, decoded: null, stretched: {} }; });
 
 /* =========================================================
    GAME
@@ -783,6 +915,7 @@ const store = {
 const pref = store.get('pref') || {};
 const G = {
   state: 'menu', song: null, speed: SPEEDS.find(s => s.id === pref.speed) || SPEEDS[1], mode: pref.mode === 'jam' ? 'jam' : 'classic',
+  back: pref.back === 'track' ? 'track' : 'synth', nudge: +(store.get('nudge') || 0), useTrack: false, trackBuf: null,
   tiles: [], backing: [], marks: [], length: 0, bi: 0, t0: 0, spb: .5, lat: 0, next: 0,
   score: 0, combo: 0, maxCombo: 0, counts: {}, holds: new Map(), flashes: [], judge: null, fail: null,
   frozen: 0, W: 0, H: 0, hitY: 0, ppb: 1, dpr: 1, finishedAt: 0,
@@ -814,11 +947,11 @@ function resize() {
 }
 new ResizeObserver(resize).observe(cv);
 
-function prepare(song) {
-  G.song = song;
+function prepare(song, buf) {
+  G.song = song; G.useTrack = !!buf; G.trackBuf = buf || null;
   const built = song.built;
   G.tiles = built.tiles.map(t => ({ ...t, state: 'live', held: 0 }));
-  G.backing = built.backing; G.marks = built.marks; G.length = built.length;
+  G.backing = buf ? [] : built.backing; G.marks = built.marks; G.length = built.length;
   G.spb = 60 / (song.bpm * G.speed.mult);
   G.bi = 0; G.next = 0; G.score = 0; G.combo = 0; G.maxCombo = 0;
   G.counts = { perfect: 0, great: 0, good: 0, miss: 0 };
@@ -832,7 +965,16 @@ function prepare(song) {
 }
 function startPlaying() {
   ac.resume();
-  G.t0 = ac.currentTime + .1 + G.song.countIn * G.spb;
+  if (G.useTrack) {
+    // start the recording so its beat 0 lands after a full count-in's worth of falling tiles
+    const m = G.speed.mult, off = (G.song.track.offset + G.nudge / 1000) / m;
+    const T = ac.currentTime + Math.max(.1, G.song.countIn * G.spb - off);
+    B.trackLP.frequency.cancelScheduledValues(0); B.trackLP.frequency.value = 20000;
+    const src = track(ac.createBufferSource()); src.buffer = G.trackBuf; src.connect(B.track); src.start(T);
+    G.t0 = T + off;
+  } else {
+    G.t0 = ac.currentTime + .1 + G.song.countIn * G.spb;
+  }
   G.state = 'playing';
 }
 setInterval(() => {
@@ -883,8 +1025,8 @@ function hit(t, b, id) {
   const when = err < 0 && err > -.2 ? Math.max(now, noteAt) : now;
   if (t.hold) {
     t.holding = true;
-    G.holds.set(id, { tile: t, voices: playLead(t, when, null, true) });
-  } else {
+    G.holds.set(id, { tile: t, voices: G.useTrack ? [] : playLead(t, when, null, true) });
+  } else if (!G.useTrack) {
     playLead(t, when, Math.min(2, Math.max(.18, t.dur * G.spb * 1.3)), false);
   }
   const bottom = tileBottom(t, b);
@@ -940,6 +1082,7 @@ function update(b) {
     if (b - t.b <= late) break;
     if (G.mode === 'classic') return fail({ kind: 'tile', tile: t });
     t.state = 'miss'; G.counts.miss++; G.combo = 0; G.next++; clunk();
+    if (G.useTrack) muffle();
   }
   if (G.next >= G.tiles.length && G.holds.size === 0 && b >= G.length + .5) finish();
 }
@@ -1143,7 +1286,7 @@ function renderMenu() {
     <li><button class="song" data-i="${i}">
       <span class="no">${String(i + 1).padStart(2, '0')}</span>
       <span class="name"><b>${s.title}</b><small>${s.artist} · ${s.year}</small></span>
-      <span class="meta"><span class="lvl">${level(s)}</span><span>${s.bpm} BPM · ${songLen(s)}</span><span>${s.built.tiles.length} tiles</span><span class="stars-sm" aria-label="Best ${bestStars(s)} of 3 stars">${starStr(bestStars(s))}</span></span>
+      <span class="meta"><span class="lvl">${level(s)}</span><span>${Math.round(s.bpm)} BPM · ${songLen(s)}</span><span>${s.built.tiles.length} tiles</span><span class="stars-sm" aria-label="Best ${bestStars(s)} of 3 stars">${starStr(bestStars(s))}</span></span>
     </button></li>`).join('');
 }
 $('#songList').addEventListener('click', e => {
@@ -1161,13 +1304,25 @@ function openSheet(song) {
     <button class="opt" id="speed-${sp.id}" data-speed="${sp.id}" aria-pressed="${sp === G.speed}">
       <b>${sp.label}</b><small>${sp.mult}× · ${Math.round(song.bpm * sp.mult)} BPM</small>
     </button>`).join('');
+  $('#trackBox').hidden = !song.track;
+  if (song.track) {
+    $('#trackMsg').textContent = 'Timed to the 4:12 instrumental. Your file stays on this device.';
+    $('#nudge').value = G.nudge; $('#nudgeVal').textContent = fmtNudge(G.nudge);
+  }
   syncSheet();
   $('#sheet').hidden = false;
   $('#sheetPlay').focus();
 }
+function fmtNudge(v) { return (v > 0 ? '+' : '') + v + ' ms'; }
 function syncSheet() {
   document.querySelectorAll('#speedSeg .opt').forEach(b => b.setAttribute('aria-pressed', b.dataset.speed === G.speed.id));
   document.querySelectorAll('#modeSeg .opt').forEach(b => b.setAttribute('aria-pressed', b.dataset.mode === G.mode));
+  if (sheetSong.track) {
+    const t = TRACKS[sheetSong.id];
+    document.querySelectorAll('#backSeg .opt').forEach(b => b.setAttribute('aria-pressed', b.dataset.back === (t ? G.back : 'synth')));
+    $('#trackShort').textContent = t ? t.name : 'Choose an MP3';
+    $('#trackPick').textContent = t ? 'Use a different file' : 'Choose MP3';
+  }
   const best = store.get(bestKey(sheetSong, G.speed, G.mode));
   $('#sheetBest').textContent = best ? `Best on this setting: ${best.score.toLocaleString()} · ${starStr(best.stars)}` : 'No score yet on this setting';
 }
@@ -1179,15 +1334,60 @@ $('#modeSeg').addEventListener('click', e => {
   const b = e.target.closest('.opt'); if (!b) return;
   G.mode = b.dataset.mode; savePref(); syncSheet();
 });
-function savePref() { store.set('pref', { speed: G.speed.id, mode: G.mode }); }
+function savePref() { store.set('pref', { speed: G.speed.id, mode: G.mode, back: G.back }); }
+$('#backSeg').addEventListener('click', e => {
+  const b = e.target.closest('.opt'); if (!b) return;
+  if (b.dataset.back === 'track' && !TRACKS[sheetSong.id]) { $('#trackFile').click(); return; }
+  G.back = b.dataset.back; savePref(); syncSheet();
+});
+$('#trackPick').addEventListener('click', () => $('#trackFile').click());
+$('#trackFile').addEventListener('change', async e => {
+  const file = e.target.files && e.target.files[0]; e.target.value = '';
+  if (!file) return;
+  const song = sheetSong, data = await file.arrayBuffer();
+  initAudio();
+  $('#trackMsg').textContent = 'Reading ' + file.name + '…';
+  let decoded;
+  try { decoded = await ac.decodeAudioData(data.slice(0)); }
+  catch (err) { $('#trackMsg').textContent = 'That file could not be decoded. Try an MP3, M4A or WAV file.'; return; }
+  TRACKS[song.id] = { name: file.name.replace(/\.[^.]+$/, '').replace(/^[0-9a-f]{6,}-/i, '').replace(/_+/g, ' ').trim(), data, decoded, stretched: {} };
+  idb.set(song.id, { name: TRACKS[song.id].name, data });
+  G.back = 'track'; savePref(); syncSheet();
+  const diff = Math.abs(decoded.duration - song.track.duration);
+  const len = `${Math.floor(decoded.duration / 60)}:${String(Math.round(decoded.duration % 60)).padStart(2, '0')}`;
+  $('#trackMsg').textContent = diff < 2
+    ? `Loaded (${len}). It matches the chart's timing. Your file stays on this device.`
+    : `Loaded (${len}), but the chart is timed to a 4:12 instrumental, so tiles may drift. Use Sync to line them up.`;
+});
+$('#nudge').addEventListener('input', e => {
+  G.nudge = +e.target.value; $('#nudgeVal').textContent = fmtNudge(G.nudge); store.set('nudge', G.nudge);
+});
 $('#sheetBack').addEventListener('click', () => { $('#sheet').hidden = true; });
 $('#sheet').addEventListener('click', e => { if (e.target.id === 'sheet') $('#sheet').hidden = true; });
 $('#sheetPlay').addEventListener('click', () => { $('#sheet').hidden = true; play(sheetSong); });
 
-function play(song) {
+async function play(song) {
+  song = song || G.song;
   initAudio(); ac.resume();
-  $('#menu').hidden = true; $('#results').hidden = true; $('#game').hidden = false;
-  prepare(song || G.song);
+  $('#results').hidden = true;
+  let buf = null;
+  if (song.track && G.back === 'track' && TRACKS[song.id]) {
+    const slow = G.speed.mult !== 1 && !TRACKS[song.id].stretched[G.speed.mult];
+    $('#loadTitle').textContent = slow ? `Preparing ${G.speed.label.toLowerCase()} speed` : 'Loading your recording';
+    $('#loadSub').textContent = slow ? 'Stretching the track to the new speed without changing its pitch. This takes a few seconds the first time.' : 'Decoding the MP3.';
+    $('#loadBar').style.width = '5%'; $('#loading').hidden = false;
+    try {
+      buf = await trackBuffer(song, G.speed.mult, p => { $('#loadBar').style.width = Math.round(5 + p * 95) + '%'; });
+    } catch (e) {
+      $('#loading').hidden = true;
+      $('#results').hidden = true; toMenu(); openSheet(song);
+      $('#trackMsg').textContent = 'That file could not be decoded. Try an MP3, M4A or WAV file.';
+      return;
+    }
+    $('#loading').hidden = true;
+  }
+  $('#menu').hidden = true; $('#game').hidden = false;
+  prepare(song, buf);
 }
 function toMenu() {
   G.state = 'menu';
