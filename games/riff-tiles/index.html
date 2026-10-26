@@ -211,7 +211,7 @@ kbd { font-family: var(--f-mono); font-size: 12px; border: 1px solid #4a4552; bo
       <div><b>Hold</b>Long tiles ring out while you keep your finger down.</div>
       <div><b>Keys</b><kbd>D</kbd> <kbd>F</kbd> <kbd>J</kbd> <kbd>K</kbd> play the four lanes. <kbd>Esc</kbd> pauses.</div>
     </div>
-    <p class="fine">Simplified arrangements, synthesized live in your browser. Turn the sound up; headphones help.</p>
+    <p class="fine">Each chart follows the real song's sections, tempo, chords and guitar parts, played by a band synthesized live in your browser. No recordings or vocals are used, and solos are freshly generated in the song's style. Headphones help: the rhythm guitars are panned left and right.</p>
   </div>
 </section>
 
@@ -283,12 +283,12 @@ const EV_RB = 'B3:.5 F#4:.5 D5:1 F#4:.5 B4:.5 D5:1';
 const EV_RG = 'G3:.5 D4:.5 B4:1 D4:.5 G4:.5 F#4:1';
 const EV_RIFF = [EV_RD, EV_RD, EV_RB, EV_RG].join(' ');
 const EV_VPROG = 'Dadd9|Dadd9|Bm7|Gmaj7';
-const EV_HOOK = 'F#5:1 E5:1 D5:1 E5:1 D5:1 B4:1 A4:2 B4:1 D5:1 E5:1 F#5:1 E5:2 D5:2';
 const EV_CPROG = 'D5|B5|G5|G5';
 
 const SNA_RIFF = 'E3~:1.5 E3~:.5 G3~:.75 E3~:.75 D3~:.5 C3~:2 B2~:2';
-const SNA_BIG = 'E3^:1.5 E3^:.5 G3^:.75 E3^:.75 D3^:.5 C3^:2 B2^:2';
-const SNA_BUILD = 'G3^:.5 G3^:.5 G3^:.5 G3^:.5 G3^:.5 G3^:.5 G3^:.5 G3^:.5 A3^:.5 A3^:.5 A3^:.5 A3^:.5 A3^:.5 A3^:.5 A3^:.5 A3^:.5';
+const SNA_BIG = 'E3^~:1.5 E3^~:.5 G3^~:.75 E3^~:.75 D3^~:.5 C3^~:2 B2^~:2';
+const SNA_PRE = 'G2^:1 G2^:1 G2^:1 G2^:1 G2^:1 G2^:1 G2^:1 G2^:1 A2^:1 A2^:1 A2^:1 A2^:1 A2^:.5 A2^:.5 A2^:.5 A2^:.5 A2^:.5 A2^:.5 A2^:.5 A2^:.5';
+const SNA_PROG = 'E5|C5 B5';
 
 const SC_D = 'D4:.5 D5:.5 A4:.5 G4:.5 G5:.5 A4:.5 F#5:.5 A4:.5';
 const SC_C = 'E4:.5 D5:.5 A4:.5 G4:.5 G5:.5 A4:.5 F#5:.5 A4:.5';
@@ -301,54 +301,79 @@ const TS_PROG = 'F5 Bb5|Ab5 Db5';
 const TS_VERSE = 'C4:1.5 Bb3:.5 r:2 C4:1.5 Ab3:.5 r:2';
 const TS_PRE = 'F3^:2 Bb2^:2 Ab2^:2 Db3^:2';
 
+/* Charts follow each song's guitar part and real section layout. Vocal melodies are never charted;
+   solos are generated fresh in the song's scale rather than copied. */
+const EV_CHUG = { type: 'chug', rhythm: '1.5 .5 1 1' };
+const MINOR_PENT = [0, 3, 5, 7, 10], MAJOR_PENT = [0, 2, 4, 7, 9];
 const SONGS = [
   {
     id: 'everlong', title: 'Everlong', artist: 'Foo Fighters', year: 1997, bpm: 158, view: 4, countIn: 4, tone: 'drive',
     sections: [
-      { name: 'Intro', prog: EV_VPROG, tone: 'clean', lead: EV_RIFF },
-      { name: 'Intro', prog: EV_VPROG, tone: 'clean', drums: 'rock', bass: 'root8', gtr: 'pad', lead: EV_RIFF, fill: true },
-      { name: 'Verse', prog: EV_VPROG, x: 2, tone: 'clean', drums: 'rock', bass: 'root8', gtr: 'pad', lead: EV_RIFF, fill: true },
-      { name: 'Chorus', prog: EV_CPROG, x: 2, drums: 'drive', bass: 'root8', gtr: 'chug8', crash: true, lead: EV_HOOK, fill: true },
-      { name: 'Verse', prog: EV_VPROG, tone: 'clean', drums: 'rock', bass: 'root8', gtr: 'pad', lead: EV_RIFF, fill: true },
-      { name: 'Chorus', prog: EV_CPROG, x: 2, drums: 'drive', bass: 'root8', gtr: 'chug8', crash: true, lead: EV_HOOK },
-      { name: 'Bridge', prog: 'Dadd9|Bm7|Gmaj7|Gmaj7', x: 2, tone: 'clean', drums: 'quiet', bass: 'whole', gtr: 'arp', lead: 'D5:4 B4:4 G4:2 F#4:2 G4:4' },
-      { name: 'Build', prog: 'A5|A5', drums: 'build', bass: 'root8', gtr: 'chug8', lead: 'A4^:1 A4^:1 A4^:1 A4^:1 A4^:.5 A4^:.5 A4^:.5 A4^:.5 B4^:.5 B4^:.5 C#5^:.5 C#5^:.5' },
-      { name: 'Chorus', prog: EV_CPROG, x: 2, drums: 'drive', bass: 'root8', gtr: 'chug8', crash: true, lead: EV_HOOK, fill: true },
-      { name: 'Outro', prog: EV_VPROG, tone: 'clean', drums: 'rock', bass: 'root8', gtr: 'pad', lead: EV_RIFF },
-      { name: 'End', prog: 'D5', bass: 'whole', gtr: 'hold', crash: true, lead: 'D4^:4' },
+      { name: 'Intro', prog: EV_VPROG, tone: 'crunch', lead: EV_RIFF },
+      { name: 'Intro', prog: EV_VPROG, tone: 'crunch', drums: 'groove', bass: 'root8', gtr: 'pad', lead: EV_RIFF, fill: true },
+      { name: 'Verse 1', prog: EV_VPROG, x: 4, tone: 'crunch', drums: 'groove', bass: 'root8', gtr: 'pad', lead: EV_RIFF, fill: true },
+      { name: 'Chorus', prog: EV_CPROG, x: 4, drums: 'drive', bass: 'root8', gtr: 'chug8', crash: 'each', gen: EV_CHUG, fill: true },
+      { name: 'Riff', prog: EV_VPROG, tone: 'crunch', drums: 'groove', bass: 'root8', gtr: 'pad', lead: EV_RIFF },
+      { name: 'Verse 2', prog: EV_VPROG, x: 4, tone: 'crunch', drums: 'groove', bass: 'root8', gtr: 'pad', lead: EV_RIFF, fill: true },
+      { name: 'Chorus', prog: EV_CPROG, x: 4, drums: 'drive', bass: 'root8', gtr: 'chug8', crash: 'each', gen: EV_CHUG, fill: true },
+      { name: 'Bridge', prog: 'Dadd9|Bm7|Gmaj7|Gmaj7', x: 4, tone: 'clean', drums: 'quiet', bass: 'whole', gtr: 'arp', gen: { type: 'hold', oct: 1 } },
+      { name: 'Build', prog: EV_CPROG, x: 2, drums: 'build', bass: 'root8', gtr: 'chug8', gen: { type: 'chug', rhythm: '1' }, fill: true },
+      { name: 'Last chorus', prog: EV_CPROG, x: 4, drums: 'drive', bass: 'root8', gtr: 'chug8', crash: 'each', gen: EV_CHUG, fill: true },
+      { name: 'Outro', prog: EV_VPROG, x: 2, tone: 'crunch', drums: 'groove', bass: 'root8', gtr: 'pad', lead: EV_RIFF, fill: true },
+      { name: 'End', prog: 'D5', bass: 'whole', gtr: 'hold', crash: true, lead: 'D3^:4' },
     ],
   },
   {
     id: 'sna', title: 'Seven Nation Army', artist: 'The White Stripes', year: 2003, bpm: 124, view: 4, countIn: 4, tone: 'drive',
     sections: [
-      { name: 'Intro', prog: 'E5|C5 B5', x: 2, drums: 'four', lead: SNA_RIFF },
-      { name: 'Verse', prog: 'E5|C5 B5', x: 4, drums: 'sna', lead: SNA_RIFF, fill: true },
-      { name: 'Build', prog: 'G5|A5', drums: 'build', bass: 'root8', lead: SNA_BUILD },
-      { name: 'Chorus', prog: 'E5|C5 B5', x: 4, drums: 'drive', bass: 'root8', crash: true, lead: SNA_BIG, fill: true },
-      { name: 'Verse', prog: 'E5|C5 B5', x: 2, drums: 'sna', lead: SNA_RIFF },
-      { name: 'Build', prog: 'G5|A5', drums: 'build', bass: 'root8', lead: SNA_BUILD },
-      { name: 'Chorus', prog: 'E5|C5 B5', x: 4, drums: 'drive', bass: 'root8', crash: true, lead: SNA_BIG, fill: true },
-      { name: 'End', prog: 'E5', bass: 'whole', crash: true, lead: 'E3^:4' },
+      { name: 'Intro', prog: SNA_PROG, x: 2, drums: 'four', lead: SNA_RIFF },
+      { name: 'Verse 1', prog: SNA_PROG, x: 4, drums: 'sna', lead: SNA_RIFF, fill: true },
+      { name: 'Pre-chorus', prog: 'G5|G5|A5|A5', drums: 'build', lead: SNA_PRE },
+      { name: 'Chorus', prog: SNA_PROG, x: 4, drums: 'snabig', crash: true, lead: SNA_BIG, fill: true },
+      { name: 'Verse 2', prog: SNA_PROG, x: 4, drums: 'sna', lead: SNA_RIFF, fill: true },
+      { name: 'Pre-chorus', prog: 'G5|G5|A5|A5', drums: 'build', lead: SNA_PRE },
+      { name: 'Chorus', prog: SNA_PROG, x: 4, drums: 'snabig', crash: true, lead: SNA_BIG, fill: true },
+      { name: 'Slide solo', prog: SNA_PROG, x: 4, drums: 'snabig', gen: { type: 'solo', key: 'E4', scale: MINOR_PENT, slide: true }, fill: true },
+      { name: 'Verse 3', prog: SNA_PROG, x: 4, drums: 'sna', lead: SNA_RIFF, fill: true },
+      { name: 'Pre-chorus', prog: 'G5|G5|A5|A5', drums: 'build', lead: SNA_PRE },
+      { name: 'Last chorus', prog: SNA_PROG, x: 4, drums: 'snabig', crash: true, lead: SNA_BIG, fill: true },
+      { name: 'End', prog: 'E5', crash: true, lead: 'E3^~:4' },
     ],
   },
   {
     id: 'teen', title: 'Smells Like Teen Spirit', artist: 'Nirvana', year: 1991, bpm: 116, view: 4, countIn: 4, tone: 'drive',
     sections: [
       { name: 'Intro', prog: TS_PROG, x: 2, tone: 'clean', lead: TS_RIFF, fill: true },
-      { name: 'Riff', prog: TS_PROG, x: 4, drums: 'drive', bass: 'root8', gtr: 'chug8', crash: true, lead: TS_RIFF, fill: true },
-      { name: 'Verse', prog: TS_PROG, x: 4, tone: 'clean', drums: 'half', bass: 'root8', lead: TS_VERSE },
-      { name: 'Pre-chorus', prog: TS_PROG, x: 2, drums: 'build', bass: 'root8', gtr: 'hold', lead: TS_PRE, fill: true },
-      { name: 'Chorus', prog: TS_PROG, x: 4, drums: 'drive', bass: 'root8', gtr: 'chug8', crash: true, lead: TS_RIFF, fill: true },
+      { name: 'Riff', prog: TS_PROG, x: 4, drums: 'tsloud', bass: 'root8', gtr: 'chug8', crash: true, lead: TS_RIFF, fill: true },
+      { name: 'Verse 1', prog: TS_PROG, x: 8, tone: 'clean', drums: 'tsgroove', bass: 'root8', lead: TS_VERSE },
+      { name: 'Pre-chorus', prog: TS_PROG, x: 4, drums: 'tsgroove', bass: 'root8', gtr: 'hold', lead: TS_PRE, fill: true },
+      { name: 'Chorus', prog: TS_PROG, x: 8, drums: 'tsloud', bass: 'root8', gtr: 'chug8', crash: true, lead: TS_RIFF, fill: true },
+      { name: 'Riff', prog: TS_PROG, x: 2, drums: 'tsloud', bass: 'root8', gtr: 'chug8', lead: TS_RIFF },
+      { name: 'Verse 2', prog: TS_PROG, x: 4, tone: 'clean', drums: 'tsgroove', bass: 'root8', lead: TS_VERSE },
+      { name: 'Pre-chorus', prog: TS_PROG, x: 4, drums: 'tsgroove', bass: 'root8', gtr: 'hold', lead: TS_PRE, fill: true },
+      { name: 'Chorus', prog: TS_PROG, x: 8, drums: 'tsloud', bass: 'root8', gtr: 'chug8', crash: true, lead: TS_RIFF, fill: true },
+      { name: 'Guitar solo', prog: TS_PROG, x: 4, drums: 'tsloud', bass: 'root8', gtr: 'chug8', gen: { type: 'solo', key: 'F4', scale: MINOR_PENT }, fill: true },
+      { name: 'Pre-chorus', prog: TS_PROG, x: 2, drums: 'tsgroove', bass: 'root8', gtr: 'hold', lead: TS_PRE, fill: true },
+      { name: 'Last chorus', prog: TS_PROG, x: 8, drums: 'tsloud', bass: 'root8', gtr: 'chug8', crash: true, lead: TS_RIFF },
+      { name: 'Outro', prog: TS_PROG, x: 4, drums: 'tsloud', bass: 'root8', gtr: 'chug8', crash: 'each', lead: TS_RIFF, fill: true },
       { name: 'End', prog: 'F5', bass: 'whole', gtr: 'hold', crash: true, lead: 'F3^:4' },
     ],
   },
   {
-    id: 'scom', title: "Sweet Child O' Mine", artist: "Guns N' Roses", year: 1987, bpm: 125, view: 3, countIn: 4, tone: 'drive',
+    id: 'scom', title: "Sweet Child O' Mine", artist: "Guns N' Roses", year: 1987, bpm: 125, view: 3, countIn: 4, tone: 'crunch',
     sections: [
       { name: 'Intro', prog: SC_PROG, lead: SC_RIFF },
-      { name: 'Band in', prog: SC_PROG, drums: 'tom', bass: 'whole', crash: true, lead: SC_RIFF, fill: true },
-      { name: 'Full band', prog: SC_PROG, x: 2, drums: 'rock', bass: 'root8', gtr: 'hold', crash: 'each', lead: SC_RIFF, fill: true },
-      { name: 'End', prog: 'D', bass: 'whole', gtr: 'hold', crash: true, lead: 'D4^:4' },
+      { name: 'Intro', prog: SC_PROG, bass: 'whole', drums: 'quiet', lead: SC_RIFF, fill: true },
+      { name: 'Intro', prog: SC_PROG, drums: 'ride', bass: 'root8', gtr: 'pad', crash: true, lead: SC_RIFF, fill: true },
+      { name: 'Verse 1', prog: SC_PROG, x: 2, drums: 'ride', bass: 'root8', gtr: 'pad', gen: { type: 'arp', rhythm: 1, order: [0, 2, 1, 3] }, fill: true },
+      { name: 'Chorus', prog: 'A|C|D|D', x: 2, drums: 'drive', bass: 'root8', gtr: 'hold', crash: true, gen: { type: 'chug', rhythm: '1.5 .5 1 1', oct: 1 }, fill: true },
+      { name: 'Riff', prog: SC_PROG, drums: 'ride', bass: 'root8', gtr: 'pad', lead: SC_RIFF, fill: true },
+      { name: 'Verse 2', prog: SC_PROG, drums: 'ride', bass: 'root8', gtr: 'pad', gen: { type: 'arp', rhythm: 1, order: [0, 2, 1, 3] }, fill: true },
+      { name: 'Chorus', prog: 'A|C|D|D', x: 2, drums: 'drive', bass: 'root8', gtr: 'hold', crash: true, gen: { type: 'chug', rhythm: '1.5 .5 1 1', oct: 1 }, fill: true },
+      { name: 'Guitar solo', prog: SC_PROG, x: 2, tone: 'drive', drums: 'rock', bass: 'root8', gtr: 'hold', crash: 'each', gen: { type: 'solo', key: 'D5', scale: MAJOR_PENT }, fill: true },
+      { name: 'Chorus', prog: 'A|C|D|D', drums: 'drive', bass: 'root8', gtr: 'hold', crash: true, gen: { type: 'chug', rhythm: '1.5 .5 1 1', oct: 1 }, fill: true },
+      { name: 'Breakdown', prog: 'E5|G5|A5|C5 D5', x: 4, tone: 'drive', drums: 'drive', bass: 'root8', gtr: 'chug8', crash: 'each', gen: { type: 'chug', rhythm: '1 .5 .5 1 1' }, fill: true },
+      { name: 'End', prog: 'D', bass: 'whole', gtr: 'hold', crash: true, lead: 'D3^:4' },
     ],
   },
 ];
@@ -369,9 +394,14 @@ const DRUMS = {
   quiet: { k: 'x.......x.......', h: 'g.g.g.g.g.g.g.g.' },
   build: { k: 'x...x...x...x...', s: 'x.x.x.x.x.x.x.x.' },
   tom: { k: 'x.......x.......', t: '....x.......x.x.', h: 'x.x.x.x.x.x.x.x.' },
+  groove: { k: 'x.....x.x.....x.', s: '....x.......x...', h: 'X.x.X.x.X.x.X.x.' },
+  tsgroove: { k: 'x.....x.x.x.....', s: '....x.......x...', h: 'x.x.x.x.x.x.x.x.' },
+  tsloud: { k: 'x.....x.x.x.....', s: '....X.......X...', o: 'x.x.x.x.x.x.x.x.' },
+  snabig: { k: 'x...x...x...x...', s: '....X.......X...', c: 'x.......x.......', o: '..x...x...x...x.' },
+  ride: { k: 'x.......x.x.....', s: '....x.......x...', r: 'x.x.x.x.x.x.x.x.' },
 };
 const VEL = { x: .8, X: 1, g: .4 };
-const INST = { k: 'kick', s: 'snare', h: 'hat', o: 'ohat', t: 'tom' };
+const INST = { k: 'kick', s: 'snare', h: 'hat', o: 'ohat', t: 'tom', c: 'crash', r: 'ride' };
 
 /* ---------- parsing ---------- */
 const PC = { C: 0, 'C#': 1, Db: 1, D: 2, 'D#': 3, Eb: 3, E: 4, F: 5, 'F#': 6, Gb: 6, G: 7, 'G#': 8, Ab: 8, A: 9, 'A#': 10, Bb: 10, B: 11 };
@@ -386,10 +416,10 @@ function parseLead(str) {
   for (const tok of str.trim().split(/\s+/)) {
     const [n, d] = tok.split(':'); const dur = parseFloat(d);
     if (n !== 'r') {
-      let name = n, mod = '';
-      if (/[\^~]$/.test(name)) { mod = name.slice(-1); name = name.slice(0, -1); }
-      const base = noteMidi(name);
-      const midi = mod === '^' ? [base, base + 7, base + 12] : mod === '~' ? [base - 12, base] : [base];
+      const name = n.replace(/[\^~]+$/, ''), mods = n.slice(name.length);
+      const base = noteMidi(name), midi = [base];
+      if (mods.includes('^')) midi.push(base + 7, base + 12);
+      if (mods.includes('~')) midi.unshift(base - 12);
       notes.push({ b, dur, midi });
     }
     b += dur;
@@ -415,11 +445,16 @@ function buildSong(song) {
     const lead = sec.lead ? parseLead(sec.lead) : null;
     const secLen = bars.length * 4;
     for (let r = 0; r < reps; r++) {
-      const start = at;
+      const start = at, segs = [];
       if (r === 0) marks.push({ b: start, name: sec.name });
       bars.forEach((barStr, bi) => {
         const chs = barStr.trim().split(/\s+/), seg = 4 / chs.length;
-        chs.forEach((c, ci) => { if (c !== '-') addHarmony(sec, parseChord(c), start + bi * 4 + ci * seg, seg, backing); });
+        chs.forEach((c, ci) => {
+          if (c === '-') return;
+          const ch = parseChord(c), b = start + bi * 4 + ci * seg;
+          segs.push({ b, len: seg, ch, name: c });
+          addHarmony(sec, ch, b, seg, backing);
+        });
         const pat = DRUMS[sec.drums || 'none'];
         const isFill = sec.fill && r === reps - 1 && bi === bars.length - 1;
         const prog = (r * bars.length + bi) / (reps * bars.length);
@@ -438,9 +473,13 @@ function buildSong(song) {
         }
       });
       if (sec.crash && (r === 0 || sec.crash === 'each')) backing.push({ b: start, k: 'crash', v: 1 }, { b: start, k: 'kick', v: 1 });
+      const tone = sec.tone || song.tone;
       if (lead) {
         if (Math.abs(lead.len - secLen) > 1e-6) console.warn(song.id, sec.name, 'lead is', lead.len, 'beats; section is', secLen);
-        for (const n of lead.notes) tiles.push({ b: start + n.b, dur: n.dur, midi: n.midi, tone: sec.tone || song.tone });
+        for (const n of lead.notes) tiles.push({ b: start + n.b, dur: n.dur, midi: n.midi, tone });
+      } else if (sec.gen) {
+        const rnd = rng(hash(song.id + sec.name + at));
+        for (const n of genPart(sec.gen, segs, start, secLen, rnd)) tiles.push({ ...n, tone });
       }
       at += secLen;
     }
@@ -454,6 +493,53 @@ function buildSong(song) {
   });
   assignLanes(tiles, hash(song.id));
   return { backing, tiles, marks, length: at };
+}
+function power(root) { return [root, root + 7, root + 12]; }
+function genPart(g, segs, start, len, rnd) {
+  const out = [], oct = 12 * (g.oct || 0);
+  if (g.type === 'chug') {
+    const rh = g.rhythm.split(' ').map(Number);
+    for (const s of segs) {
+      for (let x = 0, i = 0; x < s.len - 1e-6; i++) {
+        const d = Math.min(rh[i % rh.length], s.len - x);
+        out.push({ b: s.b + x, dur: d, midi: power(s.ch.root + oct) }); x += d;
+      }
+    }
+  } else if (g.type === 'hold') {
+    for (const s of segs) {
+      const last = out[out.length - 1];
+      if (last && last.name === s.name && Math.abs(last.b + last.dur - s.b) < 1e-6) last.dur += s.len;
+      else out.push({ b: s.b, dur: s.len, midi: s.ch.iv.map(i => s.ch.root + oct + i), name: s.name });
+    }
+  } else if (g.type === 'arp') {
+    for (const s of segs) {
+      const tones = s.ch.iv.map(i => s.ch.root + 12 + i);
+      for (let x = 0, i = 0; x < s.len - 1e-6; x += g.rhythm, i++) {
+        out.push({ b: s.b + x, dur: g.rhythm, midi: [tones[g.order[i % g.order.length] % tones.length]] });
+      }
+    }
+  } else if (g.type === 'solo') {
+    // phrases of two bars: three short rhythm cells, then a held, bent note
+    const key = noteMidi(g.key), pitches = [];
+    for (let o = -1; o <= 1; o++) for (const i of g.scale) { const m = key + o * 12 + i; if (m >= key - 7 && m <= key + 15) pitches.push(m); }
+    pitches.sort((a, b) => a - b);
+    const cells = [[1, 1], [.5, .5, 1], [1, .5, .5], [1.5, .5], [.5, .5, .5, .5], [.5, 1, .5]];
+    const steps = [-2, -1, -1, 1, 1, 2];
+    let idx = pitches.indexOf(key), b = 0;
+    while (b < len - 1e-6) {
+      const phraseEnd = Math.min(len, (Math.floor(b / 8) + 1) * 8);
+      if (phraseEnd - b <= 2) {
+        idx = Math.max(0, Math.min(pitches.length - 1, idx + (rnd() < .5 ? 1 : -1)));
+        out.push({ b: start + b, dur: phraseEnd - b, midi: [pitches[idx]], bend: true });
+        b = phraseEnd; continue;
+      }
+      for (const d of cells[Math.floor(rnd() * cells.length)]) {
+        idx = Math.max(0, Math.min(pitches.length - 1, idx + steps[Math.floor(rnd() * steps.length)]));
+        out.push({ b: start + b, dur: d, midi: [pitches[idx]], bend: !!g.slide && rnd() < .4 }); b += d;
+      }
+    }
+  }
+  return out;
 }
 function addHarmony(sec, ch, b, len, out) {
   const full = ch.iv.map(i => ch.root + i), power = [ch.root, ch.root + 7, ch.root + 12];
@@ -502,8 +588,12 @@ function distCurve(k) {
 }
 function gainTo(dest, v) { const g = ac.createGain(); g.gain.value = v; g.connect(dest); return g; }
 function filt(type, f, q) { const n = ac.createBiquadFilter(); n.type = type; n.frequency.value = f; if (q != null) n.Q.value = q; return n; }
-function makeBus({ drive = 0, lp = 5000, level = .3, send = 0, delay = 0, to }) {
-  const input = ac.createGain(), out = gainTo(to || musicBus, level);
+function makeBus({ drive = 0, lp = 5000, level = .3, send = 0, delay = 0, to, pan = 0 }) {
+  const input = ac.createGain();
+  let out;
+  if (pan && ac.createStereoPanner) {
+    const p = ac.createStereoPanner(); p.pan.value = pan; p.connect(to || musicBus); out = gainTo(p, level);
+  } else out = gainTo(to || musicBus, level);
   let node = input;
   if (drive) {
     const hp = filt('highpass', 110), sh = ac.createWaveShaper();
@@ -536,7 +626,12 @@ function initAudio() {
   B.drums = gainTo(musicBus, .85);
   B.drumVerb = gainTo(rev, .25); B.drums.connect(B.drumVerb);
   B.bass = makeBus({ drive: 3, lp: 1400, level: .55 });
-  B.rhythm = makeBus({ drive: 55, lp: 3000, level: .15, send: .15 });
+  // two rhythm guitars, hard left and right, like a double-tracked record
+  B.rhythmL = makeBus({ drive: 55, lp: 3000, level: .13, send: .12, pan: -.75 });
+  B.rhythmR = makeBus({ drive: 60, lp: 3300, level: .13, send: .12, pan: .75 });
+  B.leadCrunch = makeBus({ drive: 22, lp: 4600, level: .32, send: .25, delay: .16 });
+  if (ac.createStereoPanner) { const hp = ac.createStereoPanner(); hp.pan.value = .3; hp.connect(B.drums); B.cymbals = gainTo(hp, 1); }
+  else B.cymbals = B.drums;
   B.pad = makeBus({ lp: 4200, level: .42, send: .35 });
   B.leadDrive = makeBus({ drive: 140, lp: 4800, level: .2, send: .25, delay: .18 });
   B.leadClean = makeBus({ lp: 5500, level: .55, send: .3, delay: .2 });
@@ -561,7 +656,15 @@ function gtrVoice(dest, midi, when, dur, vel, opts = {}) {
   const f = mtof(midi), g = ac.createGain(); g.gain.value = 0; g.connect(dest);
   const clean = !!opts.clean;
   const o1 = osc('sawtooth', f, when), o2 = osc(clean ? 'triangle' : 'sawtooth', f, when);
-  o2.detune.value = clean ? 0 : 9;
+  o1.detune.value = opts.detune || 0;
+  o2.detune.value = (clean ? 0 : 9) + (opts.detune || 0);
+  if (opts.bend) {
+    [o1, o2].forEach(o => {
+      o.frequency.setValueAtTime(f * Math.pow(2, -2 / 12), when);
+      o.frequency.setValueAtTime(f * Math.pow(2, -2 / 12), when + .06);
+      o.frequency.linearRampToValueAtTime(f, when + .2);
+    });
+  }
   if (clean) {
     const lp = filt('lowpass', Math.min(7000, f * 10), 1.5);
     lp.frequency.setValueAtTime(Math.min(7000, f * 10), when);
@@ -615,8 +718,13 @@ const drum = {
     const o = osc('triangle', 195, w), og = gainTo(B.drums, 0);
     o.frequency.exponentialRampToValueAtTime(150, w + .08); o.connect(og); env(og, w, v * .5, w + .1); o.stop(w + .12);
   },
-  hat(w, v) { const n = noise(w, .05), hp = filt('highpass', 7800), g = gainTo(B.drums, 0); n.connect(hp); hp.connect(g); env(g, w, v * .26, w + .045); },
-  ohat(w, v) { const n = noise(w, .3), hp = filt('highpass', 6500), g = gainTo(B.drums, 0); n.connect(hp); hp.connect(g); env(g, w, v * .22, w + .26); },
+  hat(w, v) { const n = noise(w, .05), hp = filt('highpass', 7800), g = gainTo(B.cymbals, 0); n.connect(hp); hp.connect(g); env(g, w, v * .26, w + .045); },
+  ohat(w, v) { const n = noise(w, .3), hp = filt('highpass', 6500), g = gainTo(B.cymbals, 0); n.connect(hp); hp.connect(g); env(g, w, v * .22, w + .26); },
+  ride(w, v) {
+    const n = noise(w, .5), hp = filt('highpass', 5200), g = gainTo(B.cymbals, 0);
+    n.connect(hp); hp.connect(g); env(g, w, v * .12, w + .45);
+    const o = osc('sine', 3150, w), og = gainTo(B.cymbals, 0); o.connect(og); env(og, w, v * .05, w + .3); o.stop(w + .32);
+  },
   crash(w, v) {
     const n = noise(w, 1.9, 0), hp = filt('highpass', 3800), bp = filt('peaking', 6000, .8), g = gainTo(B.drums, 0);
     bp.gain.value = 6; n.connect(hp); hp.connect(bp); bp.connect(g); env(g, w, v * .38, w + 1.85);
@@ -632,7 +740,12 @@ const drum = {
 };
 function playEvent(ev, when, spb) {
   switch (ev.k) {
-    case 'gtr': ev.notes.forEach(m => gtrVoice(B.rhythm, m, when, ev.dur * spb, ev.v)); break;
+    case 'gtr':
+      ev.notes.forEach(m => {
+        gtrVoice(B.rhythmL, m, when, ev.dur * spb, ev.v, { detune: -5 });
+        gtrVoice(B.rhythmR, m, when + .011, ev.dur * spb, ev.v, { detune: 6 });
+      });
+      break;
     case 'pad': ev.notes.forEach(m => gtrVoice(B.pad, m, when, ev.dur * spb, ev.v, { clean: true, pad: true })); break;
     case 'bass': bassVoice(ev.m, when, ev.dur * spb, ev.v); break;
     default: if (drum[ev.k]) drum[ev.k](when, ev.v, ev.p);
@@ -640,9 +753,9 @@ function playEvent(ev, when, spb) {
 }
 function playLead(tile, when, durSec, hold) {
   const clean = tile.tone === 'clean';
-  const dest = clean ? B.leadClean : B.leadDrive;
+  const dest = clean ? B.leadClean : tile.tone === 'crunch' ? B.leadCrunch : B.leadDrive;
   const vel = (clean ? .5 : .55) / Math.sqrt(tile.midi.length);
-  return tile.midi.map(m => gtrVoice(dest, m, when, durSec, vel, { clean, vib: hold && !clean }));
+  return tile.midi.map(m => gtrVoice(dest, m, when, durSec, vel, { clean, vib: hold && !clean, bend: tile.bend }));
 }
 function clunk() {
   const w = ac.currentTime, n = noise(w, .09), lp = filt('lowpass', 500), g = gainTo(sfxBus, 0);
@@ -1021,12 +1134,16 @@ function level(song) {
   const sec = song.built.length * 60 / song.bpm, tps = song.built.tiles.length / sec;
   return tps < 2.3 ? 'Easy' : tps < 3.2 ? 'Medium' : 'Hard';
 }
+function songLen(song) {
+  const sec = Math.round(song.built.length * 60 / song.bpm);
+  return `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, '0')}`;
+}
 function renderMenu() {
   $('#songList').innerHTML = SONGS.map((s, i) => `
     <li><button class="song" data-i="${i}">
       <span class="no">${String(i + 1).padStart(2, '0')}</span>
       <span class="name"><b>${s.title}</b><small>${s.artist} · ${s.year}</small></span>
-      <span class="meta"><span class="lvl">${level(s)}</span><span>${s.bpm} BPM</span><span>${s.built.tiles.length} tiles</span><span class="stars-sm" aria-label="Best ${bestStars(s)} of 3 stars">${starStr(bestStars(s))}</span></span>
+      <span class="meta"><span class="lvl">${level(s)}</span><span>${s.bpm} BPM · ${songLen(s)}</span><span>${s.built.tiles.length} tiles</span><span class="stars-sm" aria-label="Best ${bestStars(s)} of 3 stars">${starStr(bestStars(s))}</span></span>
     </button></li>`).join('');
 }
 $('#songList').addEventListener('click', e => {
